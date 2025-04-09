@@ -17,6 +17,12 @@ export const EventList = ({ events, isGridView }) => {
   const token = userData ? userData.token : null;
 
   useEffect(() => {
+    // Force refresh the page when the component mounts
+    window.location.reload();
+  }, []);
+
+
+  useEffect(() => {
     const checkSavedEvents = async () => {
       if (!token || !events.length) return;
 
