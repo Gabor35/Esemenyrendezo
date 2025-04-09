@@ -30,42 +30,37 @@ export const Login = () => {
 
   // Check for logged-in user on component mount
   useEffect(() => {
+    if (loggedIn) {
+      alert(`${loggedUser.name} sikeresen bejelentkezett!`);
+    }
     const storedUser = JSON.parse(localStorage.getItem("felhasz"));
-    
     if (storedUser) {
       setUser(storedUser);
-      setAvatar(`${ftpUrl}${storedUser.profilePicturePath || ''}`);
-      setLoggedUser(storedUser);
-      setLoggedIn(true);
+      setAvatar(`${ftpUrl}${storedUser.profilePicturePath}`);
       navigate("/events");
     }
-  }, [navigate, loggedIn, ftpUrl, setLoggedUser, setLoggedIn]);
+  }, [navigate, loggedIn]);
 
   // Handle user logout
   const handleLogout = async () => {
-    try {
-      if (user?.token) {
+    if (user?.token) {
+      try {
         await axios.post(`${apiUrl}Logout/${user.token}`);
+        alert("Kijelentkezés sikeres!");
+      } catch (error) {
+        console.error("Hiba történt a kijelentkezés során:", error);
       }
-      localStorage.removeItem("felhasz");
-      setUser(null);
-      setLoggedUser(null);
-      setLoggedIn(false);
-      setAvatar("");
-      navigate("/login");
-    } catch (error) {
-      console.error("Hiba történt a kijelentkezés során:", error);
     }
+    localStorage.removeItem("felhasz");
+    setUser(null);
+    setAvatar("");
+    alert("Sikeres kijelentkezés!");
+    navigate("/login");
   };
 
   // Handle user login
   const handleLogin = async () => {
     try {
-      if (!loginName || !password) {
-        alert("Kérjük, töltse ki mindkét mezőt!");
-        return;
-      }
-
       // Get salt for the user
       const { data: salt } = await axios.post(`${apiUrl}Login/GetSalt/${loginName}`);
       
@@ -73,32 +68,27 @@ export const Login = () => {
       const tmpHash = sha256(password + salt.toString());
       
       // Attempt login
-      const { data: userData } = await axios.post(`${apiUrl}Login`, { 
-        loginName, 
-        tmpHash 
-      });
+      const loginResponse = await axios.post(`${apiUrl}Login`, { loginName, tmpHash });
 
-      if (userData) {
-        // Normalize user data structure
-        const normalizedUser = {
-          ...userData,
-          name: userData.teljesNev || userData.felhasznaloNev || loginName,
-          profilePicturePath: userData.fenykepUtvonal || ''
-        };
-
-        setLoggedUser(normalizedUser);
+      if (loginResponse.status === 200) {
+        const userData = loginResponse.data;
+        setLoggedUser(userData);
         setLoggedUserName(loginName);
         setLoggedIn(true);
-        localStorage.setItem("felhasz", JSON.stringify(normalizedUser));
-        setUser(normalizedUser);
-        setAvatar(`${ftpUrl}${normalizedUser.profilePicturePath}`);
+        localStorage.setItem("felhasz", JSON.stringify(userData));
+        setUser(userData);
+        setAvatar(`${ftpUrl}${userData.profilePicturePath}`);
         navigate("/events");
+        window.location.reload();
+      } else {
+        alert("Hiba történt a bejelentkezéskor!");
       }
     } catch (error) {
-      alert("Hiba történt: " + (error.response?.data?.message || error.message));
+      alert("Hiba történt: " + error.message);
     }
   };
 
+  // Render component
   return (
     <Container className="d-flex justify-content-center align-items-center vh-100">
       <motion.div
@@ -111,7 +101,7 @@ export const Login = () => {
           {user ? (
             // Logged in user view
             <Card.Body className="text-center">
-              <h2 className="title">Üdv, {user.name || 'Felhasználó'}!</h2>
+              <h2 className="title">Üdv, {user.name}!</h2>
               {avatar && (
                 <Image 
                   src={avatar} 
@@ -119,10 +109,6 @@ export const Login = () => {
                   width="120" 
                   height="120" 
                   className="profile-avatar" 
-                  onError={(e) => {
-                    e.target.onerror = null; 
-                    e.target.src = 'default-avatar.png';
-                  }}
                 />
               )}
               <Button 

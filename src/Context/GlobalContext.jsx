@@ -1,5 +1,5 @@
 // src/Context/GlobalContext.jsx
-import { createContext, useContext, useState} from "react";
+import { createContext, useContext, useState } from "react";
 
 const GlobalContext = createContext();
 
@@ -10,7 +10,7 @@ export const GlobalProvider = ({ children }) => {
     permission: 0,
     profilePicturePath: "",
     token: "",
-    refreshToken: "", // Add refresh token to state
+    refreshToken: "",
   });
   const [loggedIn, setLoggedIn] = useState(false);
   const [loggedUserName, setLoggedUserName] = useState("");
@@ -27,7 +27,7 @@ export const GlobalProvider = ({ children }) => {
         loggedUserName,
         setLoggedUserName,
         apiUrl,
-        ftpUrl
+        ftpUrl,
       }}
     >
       {children}
