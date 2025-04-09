@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useGlobalContext } from '../Context/GlobalContext';
 import axios from 'axios';
 
 const AddEvent = ({ onAddEvent }) => {
@@ -11,6 +12,7 @@ const AddEvent = ({ onAddEvent }) => {
   });
   const [error, setError] = useState(''); // Stores error messages
   const [isUploading, setIsUploading] = useState(false); // Tracks image upload status
+  const { TokenUrl } = useGlobalContext();
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -36,7 +38,6 @@ const AddEvent = ({ onAddEvent }) => {
         const base64File = reader.result.split(',')[1]; // Extract Base64 content
         const fileName = `${Date.now()}.png`; // Use current datetime in milliseconds as the file name
         const githubApiUrl = `https://api.github.com/repos/Gabor35/Images/contents/kepek/${fileName}`;
-        const personalAccessToken = process.env.REACT_APP_GITHUB_TOKEN; // Use environment variable
 
         const response = await axios.put(
           githubApiUrl,
@@ -46,7 +47,7 @@ const AddEvent = ({ onAddEvent }) => {
           },
           {
             headers: {
-              Authorization: `Bearer ${personalAccessToken}`,
+              Authorization: `Bearer ${TokenUrl}`,
               'Content-Type': 'application/json'
             }
           }

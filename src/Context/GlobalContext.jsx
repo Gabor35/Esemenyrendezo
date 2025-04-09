@@ -26,6 +26,11 @@ export const GlobalProvider = ({ children }) => {
       process.env.REACT_APP_FTP_URL ||
       "https://esemenyrendezo.onrender.com/"
   );
+  const [TokenUrl] = useState(
+    () =>
+      process.env.REACT_APP_GITHUB_TOKEN ||
+      "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"
+  );
 
   return (
     <GlobalContext.Provider
@@ -38,6 +43,7 @@ export const GlobalProvider = ({ children }) => {
         setLoggedUserName,
         apiUrl,
         ftpUrl,
+        TokenUrl,
       }}
     >
       {children}
