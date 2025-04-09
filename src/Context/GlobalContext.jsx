@@ -1,4 +1,3 @@
-// src/Context/GlobalContext.jsx
 import { createContext, useContext, useState } from "react";
 
 const GlobalContext = createContext();
@@ -12,10 +11,21 @@ export const GlobalProvider = ({ children }) => {
     token: "",
     refreshToken: "",
   });
+
   const [loggedIn, setLoggedIn] = useState(false);
   const [loggedUserName, setLoggedUserName] = useState("");
-  const [apiUrl] = useState(() => process.env.REACT_APP_API_URL || "");
-  const [ftpUrl] = useState(() => process.env.REACT_APP_FTP_URL || "");
+
+  // Fallbacks provided in case environment variables are missing
+  const [apiUrl] = useState(
+    () =>
+      process.env.REACT_APP_API_URL ||
+      "https://esemenyrendezo1.azurewebsites.net/api/"
+  );
+  const [ftpUrl] = useState(
+    () =>
+      process.env.REACT_APP_FTP_URL ||
+      "https://esemenyrendezo.onrender.com/"
+  );
 
   return (
     <GlobalContext.Provider
@@ -42,3 +52,5 @@ export const useGlobalContext = () => {
   }
   return context;
 };
+
+export default GlobalContext;

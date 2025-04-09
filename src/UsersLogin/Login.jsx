@@ -60,53 +60,53 @@ export const Login = () => {
 
   // Handle user login
   const handleLogin = async () => {
-  try {
-    if (!loginName || !password) {
-      alert("Kérjük, töltse ki mindkét mezőt!");
-      return;
+    try {
+      if (!loginName || !password) {
+        alert("Kérjük, töltse ki mindkét mezőt!");
+        return;
+      }
+  
+      // Get salt for the user
+      const { data: salt } = await axios.post(`${apiUrl}Login/GetSalt/${loginName}`);
+  
+      // Create hash with password and salt
+      const tmpHash = sha256(password + salt.toString());
+  
+      // Attempt login
+      const { data: userData } = await axios.post(`${apiUrl}Login`, { 
+        loginName, 
+        tmpHash 
+      });
+  
+      if (userData) {
+        // Normalization: check for lowercase or uppercase property names returned by the backend
+        const normalizedUser = {
+          ...userData,
+          name:
+            userData.name ||       // if JSON output is camelCase
+            userData.Name ||       // fallback if still uppercase
+            userData.teljesNev ||
+            userData.felhasznaloNev || 
+            loginName,
+          profilePicturePath:
+            userData.profilePicturePath ||
+            userData.ProfilePicturePath ||
+            userData.fenykepUtvonal ||
+            ''
+        };
+  
+        setLoggedUser(normalizedUser);
+        setLoggedUserName(loginName);
+        setLoggedIn(true);
+        localStorage.setItem("felhasz", JSON.stringify(normalizedUser));
+        setUser(normalizedUser);
+        setAvatar(`${ftpUrl}${normalizedUser.profilePicturePath}`);
+        navigate("/events");
+      }
+    } catch (error) {
+      alert("Hiba történt: " + (error.response?.data?.message || error.message));
     }
-
-    // Get salt for the user
-    const { data: salt } = await axios.post(`${apiUrl}Login/GetSalt/${loginName}`);
-
-    // Create hash with password and salt
-    const tmpHash = sha256(password + salt.toString());
-
-    // Attempt login
-    const { data: userData } = await axios.post(`${apiUrl}Login`, { 
-      loginName, 
-      tmpHash 
-    });
-
-    if (userData) {
-      // Normalization: check for lowercase or uppercase property names returned by the backend
-      const normalizedUser = {
-        ...userData,
-        name:
-          userData.name ||       // if JSON output is camelCase
-          userData.Name ||       // fallback if still uppercase
-          userData.teljesNev ||
-          userData.felhasznaloNev || 
-          loginName,
-        profilePicturePath:
-          userData.profilePicturePath ||
-          userData.ProfilePicturePath ||
-          userData.fenykepUtvonal ||
-          ''
-      };
-
-      setLoggedUser(normalizedUser);
-      setLoggedUserName(loginName);
-      setLoggedIn(true);
-      localStorage.setItem("felhasz", JSON.stringify(normalizedUser));
-      setUser(normalizedUser);
-      setAvatar(`${ftpUrl}${normalizedUser.profilePicturePath}`);
-      navigate("/events");
-    }
-  } catch (error) {
-    alert("Hiba történt: " + (error.response?.data?.message || error.message));
-  }
-};
+  };
 
   // Render component
   return (
