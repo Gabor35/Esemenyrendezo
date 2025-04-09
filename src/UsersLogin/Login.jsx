@@ -31,7 +31,7 @@ export const Login = () => {
   // Check for logged-in user on component mount
   useEffect(() => {
     if (loggedIn) {
-      alert(`${loggedUser.name} sikeresen bejelentkezett!`);
+      console.log(`${loggedUser.name} sikeresen bejelentkezett!`);
     }
     const storedUser = JSON.parse(localStorage.getItem("felhasz"));
     if (storedUser) {
@@ -46,7 +46,7 @@ export const Login = () => {
     if (user?.token) {
       try {
         await axios.post(`${apiUrl}Logout/${user.token}`);
-        alert("Kijelentkezés sikeres!");
+        console.log("Kijelentkezés sikeres!");
       } catch (error) {
         console.error("Hiba történt a kijelentkezés során:", error);
       }
@@ -54,7 +54,7 @@ export const Login = () => {
     localStorage.removeItem("felhasz");
     setUser(null);
     setAvatar("");
-    alert("Sikeres kijelentkezés!");
+    console.log("Sikeres kijelentkezés!");
     navigate("/login");
   };
 
