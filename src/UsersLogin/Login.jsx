@@ -28,10 +28,6 @@ export const Login = () => {
   
   const navigate = useNavigate();
 
-  useEffect(() => {
-    window.location.reload();
-  }, []);
-
   // Check for logged-in user on component mount
   useEffect(() => {
     if (loggedIn) {
