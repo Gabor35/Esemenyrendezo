@@ -17,7 +17,6 @@ import { Saved } from "./saved";
 import Esemenyek from "./Esemenyek";
 import axios from "axios";
 import Aboutus from "./aboutus";
-import Profile from "./profile";
 import gear from "../pictures/gear-fill.svg";
 import gridIcon from "../pictures/grid.svg";
 import listIcon from "../pictures/card-list.svg";
@@ -283,9 +282,6 @@ const AppContent = () => {
                         zIndex: 10,
                       }}
                     >
-                      <NavLink to="/profile" className="btn btn-primary w-100 mb-2">
-                        Fiók
-                      </NavLink>
                       <button
                         onClick={() => {
                           localStorage.removeItem("felhasz");
@@ -402,7 +398,6 @@ const AppContent = () => {
           <Route path="/calendar" element={<Calendar />} />
           <Route path="/saved" element={<Saved />} />
           <Route path="/aboutus" element={<Aboutus />} />
-          <Route path="/profile" element={<Profile />} />
           <Route path="*" element={<Login />} />
         </Routes>
       </div>
