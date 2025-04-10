@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import axios from 'axios';
-import { uploadImage, saveEvent } from './firebase2';  // Firebase funkciók importálása
+import { uploadImage, saveEvent } from './firebase';  // Firebase funkciók importálása
 
 const AddEvent = ({ onAddEvent }) => {
   const [newEvent, setNewEvent] = useState({
