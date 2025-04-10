@@ -16,12 +16,14 @@ export const EventList = ({ events, isGridView }) => {
   const userData = JSON.parse(localStorage.getItem('felhasz'));
   const token = userData ? userData.token : null;
 
-  // Ensure the page reloads only once
+  // Ensure the page refreshes after 1 second only once
   useEffect(() => {
     const hasRefreshed = sessionStorage.getItem("hasRefreshed");
     if (!hasRefreshed) {
       sessionStorage.setItem("hasRefreshed", "true");
-      window.location.reload();
+      setTimeout(() => {
+        window.location.reload();
+      }, 1000); // Refresh after 1 second
     }
   }, []);
 
