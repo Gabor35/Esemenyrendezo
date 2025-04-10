@@ -1,11 +1,15 @@
 import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import axios from "axios";
+import { useGlobalContext } from "../Context/GlobalContext";
 
 const Chat = () => {
   const [messages, setMessages] = useState([]);
   const [newMessage, setNewMessage] = useState("");
-  const [token] = useState("YOUR_API_TOKEN"); // Replace with actual token
+  const { loggedUser } = useGlobalContext(); // Get the logged user from global context
+  
+  // Get token from the loggedUser (if available)
+  const token = loggedUser?.token || "";
 
   useEffect(() => {
     const fetchMessages = async () => {
@@ -29,6 +33,7 @@ const Chat = () => {
       };
 
       try {
+        // Use the token from loggedUser here in the API endpoint
         await axios.post(`https://esemenyrendezo1.azurewebsites.net/api/ChatMessage/${token}`, newMessageObj);
         setMessages([...messages, newMessageObj]);
         setNewMessage("");
@@ -58,7 +63,7 @@ const Chat = () => {
 
         <div
           className="p-3 rounded-lg border border-gray-300 bg-light shadow-sm"
-          style={{ maxHeight: "450px", overflowY: "auto" }} // Nem görget le automatikusan
+          style={{ maxHeight: "450px", overflowY: "auto" }}
         >
           {messages.map((message, index) => (
             <motion.div
