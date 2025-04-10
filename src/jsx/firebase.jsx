@@ -13,7 +13,7 @@ import {
   getDownloadURL
 } from 'firebase/storage';
 
-// Firebase konfiguráció
+// 🔧 Firebase konfiguráció
 const firebaseConfig = {
   apiKey: "AIzaSyApLu5bmYByHbdzuuQ7Qged9Qj8dpgi570",
   authDomain: "esemenyrendezo-71f5b.firebaseapp.com",
@@ -25,7 +25,7 @@ const firebaseConfig = {
   measurementId: "G-X9VW5Y4CS4"
 };
 
-// Firebase inicializálás
+// 🚀 Firebase inicializálás
 const app = initializeApp(firebaseConfig);
 const database = getDatabase(app);
 const storage = getStorage(app);
@@ -53,16 +53,22 @@ export function listenForMessages(setMessages) {
   });
 }
 
-// 🔹 Kép feltöltése Firebase Storage-ba
-export const uploadImage = (file, callback) => {
-  const fileRef = storageRef(storage, `images/${file.name}`);
+// 🔹 Kép feltöltése Firebase Storage-ba (hibakezeléssel)
+export const uploadImage = async (file, callback) => {
+  if (!file || !file.name) {
+    console.error("❌ Hibás vagy hiányzó fájl a feltöltéshez:", file);
+    return;
+  }
 
-  uploadBytes(fileRef, file).then((snapshot) => {
-    getDownloadURL(snapshot.ref).then((downloadURL) => {
-      console.log('Fájl URL:', downloadURL);
-      if (callback) callback(downloadURL);
-    });
-  });
+  try {
+    const fileRef = storageRef(storage, `images/${file.name}`);
+    const snapshot = await uploadBytes(fileRef, file);
+    const downloadURL = await getDownloadURL(snapshot.ref);
+    console.log('✅ Fájl feltöltve, elérési URL:', downloadURL);
+    if (callback) callback(downloadURL);
+  } catch (error) {
+    console.error('🔥 Hiba a fájl feltöltése közben:', error);
+  }
 };
 
 // 🔹 Esemény mentése Realtime Database-be
@@ -70,9 +76,9 @@ export const saveEvent = (event) => {
   const eventRef = dbRef(database, 'events/' + event.id);
   set(eventRef, event)
     .then(() => {
-      console.log('Esemény sikeresen mentve!');
+      console.log('✅ Esemény sikeresen mentve!');
     })
     .catch((error) => {
-      console.error('Hiba az esemény mentésekor:', error);
+      console.error('❌ Hiba az esemény mentésekor:', error);
     });
 };

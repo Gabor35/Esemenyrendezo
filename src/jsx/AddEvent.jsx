@@ -10,26 +10,29 @@ const AddEvent = ({ onAddEvent }) => {
     Kepurl: ''
   });
 
-  const [imageFile, setImageFile] = useState(null);  // 🔹 Kép fájl mentése a feltöltéshez
+  const [imageFile, setImageFile] = useState(null);
   const [error, setError] = useState('');
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setNewEvent({
-      ...newEvent,
+    setNewEvent(prev => ({
+      ...prev,
       [name]: value
-    });
+    }));
   };
 
   const handleImageChange = (e) => {
     const file = e.target.files[0];
-    if (file) {
+    if (file && file.type.startsWith("image/")) {
       const imageUrl = URL.createObjectURL(file);
-      setImageFile(file);  // 🔹 Valódi fájl mentése
-      setNewEvent({
-        ...newEvent,
-        Kepurl: imageUrl  // Csak előnézethez
-      });
+      setImageFile(file);
+      setNewEvent(prev => ({
+        ...prev,
+        Kepurl: imageUrl
+      }));
+    } else {
+      setError("Csak érvényes képfájlt lehet feltölteni.");
+      setImageFile(null);
     }
   };
 
@@ -39,21 +42,29 @@ const AddEvent = ({ onAddEvent }) => {
       return;
     }
 
-    const newEventObj = { ...newEvent, EsemenyID: Date.now() };
+    setError('');
+    const newEventObj = { ...newEvent, id: Date.now() };
 
-    if (imageFile) {
-      // 🔹 Kép feltöltése a fájl objektummal
+    if (imageFile && imageFile.name) {
       uploadImage(imageFile, (imageURL) => {
+        if (!imageURL) {
+          setError("Hiba történt a kép feltöltése során.");
+          return;
+        }
+
         const updatedEvent = { ...newEventObj, Kepurl: imageURL };
         saveEvent(updatedEvent);
         onAddEvent(updatedEvent);
+        resetForm();
       });
     } else {
       saveEvent(newEventObj);
       onAddEvent(newEventObj);
+      resetForm();
     }
+  };
 
-    // 🔹 Mezők törlése
+  const resetForm = () => {
     setNewEvent({
       Cime: '',
       Helyszin: '',
@@ -128,7 +139,13 @@ const AddEvent = ({ onAddEvent }) => {
 
         {error && <div className="alert alert-danger">{error}</div>}
 
-        <button type="button" className="btn btn-secondary" onClick={handleAddEvent}>Hozzáadás</button>
+        <button
+          type="button"
+          className="btn btn-secondary"
+          onClick={handleAddEvent}
+        >
+          Hozzáadás
+        </button>
       </form>
     </div>
   );
