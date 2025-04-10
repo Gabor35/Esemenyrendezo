@@ -1,45 +1,23 @@
 import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import axios from "axios";
-import { useGlobalContext } from "../Context/GlobalContext";
+import { sendMessage, listenForMessages } from './firebase';  // Importáljuk a Firebase üzenetküldő és lekérő funkciókat
 
 const Chat = () => {
   const [messages, setMessages] = useState([]);
   const [newMessage, setNewMessage] = useState("");
-  const { loggedUser } = useGlobalContext(); // Get the logged user from global context
-  
-  // Get token from the loggedUser (if available)
-  const token = loggedUser?.token || "";
+  const [userId] = useState("user123");  // Példa felhasználói ID, amit a Firebase-ben használunk
 
+  // Üzenetek lekérése Firebase-ből valós időben
   useEffect(() => {
-    const fetchMessages = async () => {
-      try {
-        const response = await axios.get("https://esemenyrendezo1.azurewebsites.net/api/ChatMessage");
-        setMessages(response.data);
-      } catch (error) {
-        console.error("Error fetching chat messages:", error);
-      }
-    };
-
-    fetchMessages();
+    listenForMessages(setMessages);  // Firebase üzenetek figyelése
   }, []);
 
+  // Üzenet küldése Firebase-be
   const handleSendMessage = async () => {
     if (newMessage.trim()) {
-      const newMessageObj = {
-        user: "You",
-        text: newMessage,
-        time: new Date().toISOString(),
-      };
-
-      try {
-        // Use the token from loggedUser here in the API endpoint
-        await axios.post(`https://esemenyrendezo1.azurewebsites.net/api/ChatMessage/${token}`, newMessageObj);
-        setMessages([...messages, newMessageObj]);
-        setNewMessage("");
-      } catch (error) {
-        console.error("Error sending message:", error);
-      }
+      sendMessage(newMessage, userId);  // Üzenet küldése Firebase-be
+      setMessages([...messages, { userId: userId, message: newMessage, timestamp: Date.now() }]);  // Helyi üzenet hozzáadása
+      setNewMessage("");  // Üzenet bevitel törlése
     }
   };
 
@@ -58,12 +36,12 @@ const Chat = () => {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
         >
-          Chat
+          💬 Chat Fórum
         </motion.h1>
 
         <div
           className="p-3 rounded-lg border border-gray-300 bg-light shadow-sm"
-          style={{ maxHeight: "450px", overflowY: "auto" }}
+          style={{ maxHeight: "450px", overflowY: "auto" }} // Nem görget le automatikusan
         >
           {messages.map((message, index) => (
             <motion.div
@@ -74,12 +52,12 @@ const Chat = () => {
               transition={{ duration: 0.3, delay: index * 0.1 }}
             >
               <div className="d-flex justify-content-between">
-                <strong className={message.user === "You" ? "text-primary" : "text-success"}>
-                  {message.user}
+                <strong className={message.userId === "user123" ? "text-primary" : "text-success"}>
+                  {message.userId}
                 </strong>
-                <span className="text-muted small">{new Date(message.time).toLocaleString()}</span>
+                <span className="text-muted small">{new Date(message.timestamp).toLocaleString()}</span>
               </div>
-              <p className="mt-2">{message.text}</p>
+              <p className="mt-2">{message.message}</p>
             </motion.div>
           ))}
         </div>
