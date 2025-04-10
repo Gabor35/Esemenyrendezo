@@ -108,6 +108,13 @@ export const Login = () => {
     }
   };
 
+  const handleLoginWithRefresh = () => {
+    handleLogin();
+    setTimeout(() => {
+      window.location.reload();
+    }, 1000); // Refresh after 1 second
+  };
+
   // Render component
   return (
     <Container className="d-flex justify-content-center align-items-center vh-100">
@@ -147,7 +154,7 @@ export const Login = () => {
                 <Form.Group className="mb-3">
                   <Form.Control
                     type="email"
-                    placeholder="E-mail"
+                    placeholder="Felhasználónév"
                     value={loginName}
                     onChange={(e) => setLoginName(e.target.value)}
                     className="input-field"
@@ -164,8 +171,8 @@ export const Login = () => {
                 </Form.Group>
                 <Button 
                   variant="primary" 
-                  className="w-100 login-btn" 
-                  onClick={handleLogin}
+                  className="w-100 login-btn"
+                  onClick={handleLoginWithRefresh}
                 >
                   Bejelentkezés
                 </Button>
