@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
-import axios from 'axios';
-import { uploadImage, saveEvent } from './firebase';  // Firebase funkciók importálása
+import { uploadImage, saveEvent } from './firebase';
 
 const AddEvent = ({ onAddEvent }) => {
   const [newEvent, setNewEvent] = useState({
@@ -8,9 +7,11 @@ const AddEvent = ({ onAddEvent }) => {
     Helyszin: '',
     Datum: '',
     Leiras: '',
-    Kepurl: ''  // Kép URL-t is tárolunk
+    Kepurl: ''
   });
-  const [error, setError] = useState('');  // Hibák tárolása
+
+  const [imageFile, setImageFile] = useState(null);  // 🔹 Kép fájl mentése a feltöltéshez
+  const [error, setError] = useState('');
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -23,49 +24,50 @@ const AddEvent = ({ onAddEvent }) => {
   const handleImageChange = (e) => {
     const file = e.target.files[0];
     if (file) {
-      const imageUrl = URL.createObjectURL(file);  // Kép URL létrehozása
+      const imageUrl = URL.createObjectURL(file);
+      setImageFile(file);  // 🔹 Valódi fájl mentése
       setNewEvent({
         ...newEvent,
-        Kepurl: imageUrl  // Kép URL tárolása az állapotban
+        Kepurl: imageUrl  // Csak előnézethez
       });
     }
   };
 
   const handleAddEvent = () => {
-    // Validálás, hogy a kötelező mezők ki vannak-e töltve, és a kép is ki van-e választva
     if (!newEvent.Cime || !newEvent.Helyszin || !newEvent.Datum) {
-      setError('Minden mezőt ki kell tölteni, kivéve az esemény leírását!');  // Hibás mezők üzenete
+      setError('Minden mezőt ki kell tölteni, kivéve az esemény leírását!');
       return;
     }
 
     const newEventObj = { ...newEvent, EsemenyID: Date.now() };
 
-    // Küldjük a képet Firebase Storage-ba
-    if (newEvent.Kepurl) {
-      uploadImage(newEvent.Kepurl).then((imageURL) => {
+    if (imageFile) {
+      // 🔹 Kép feltöltése a fájl objektummal
+      uploadImage(imageFile, (imageURL) => {
         const updatedEvent = { ...newEventObj, Kepurl: imageURL };
-        saveEvent(updatedEvent);  // Esemény mentése Firebase-be
-        onAddEvent(updatedEvent); // Új esemény hozzáadása a szülő komponenshez
+        saveEvent(updatedEvent);
+        onAddEvent(updatedEvent);
       });
     } else {
-      saveEvent(newEventObj);  // Kép nélküli esemény mentése Firebase-be
-      onAddEvent(newEventObj); // Új esemény hozzáadása a szülő komponenshez
+      saveEvent(newEventObj);
+      onAddEvent(newEventObj);
     }
 
+    // 🔹 Mezők törlése
     setNewEvent({
       Cime: '',
       Helyszin: '',
       Datum: '',
       Leiras: '',
-      Kepurl: ''  // Kép URL törlése, ha az eseményt hozzáadták
+      Kepurl: ''
     });
-    setError('');  // Hiba törlése
+    setImageFile(null);
+    setError('');
   };
 
   return (
     <div>
       <form>
-        {/* Esemény cím */}
         <div className="mb-3">
           <input
             type="text"
@@ -77,7 +79,6 @@ const AddEvent = ({ onAddEvent }) => {
           />
         </div>
 
-        {/* Helyszín */}
         <div className="mb-3">
           <input
             type="text"
@@ -89,7 +90,6 @@ const AddEvent = ({ onAddEvent }) => {
           />
         </div>
 
-        {/* Dátum */}
         <div className="mb-3">
           <input
             type="datetime-local"
@@ -100,7 +100,6 @@ const AddEvent = ({ onAddEvent }) => {
           />
         </div>
 
-        {/* Leírás */}
         <div className="mb-3">
           <textarea
             name="Leiras"
@@ -111,7 +110,6 @@ const AddEvent = ({ onAddEvent }) => {
           />
         </div>
 
-        {/* Kép feltöltése */}
         <div className="mb-3">
           <label htmlFor="imageUpload" className="form-label">Válassz képet</label>
           <input
@@ -119,6 +117,7 @@ const AddEvent = ({ onAddEvent }) => {
             id="imageUpload"
             className="form-control"
             onChange={handleImageChange}
+            accept="image/*"
           />
           {newEvent.Kepurl && (
             <div className="mt-3">
@@ -127,7 +126,6 @@ const AddEvent = ({ onAddEvent }) => {
           )}
         </div>
 
-        {/* Hibás mezők üzenete */}
         {error && <div className="alert alert-danger">{error}</div>}
 
         <button type="button" className="btn btn-secondary" onClick={handleAddEvent}>Hozzáadás</button>
