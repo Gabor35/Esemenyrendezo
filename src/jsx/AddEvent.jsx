@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'; // Added `useEffect` to the import
+import React, { useState } from 'react';
 import { useGlobalContext } from '../Context/GlobalContext';
 import axios from 'axios';
 
@@ -12,16 +12,7 @@ const AddEvent = ({ onAddEvent }) => {
   });
   const [error, setError] = useState(''); // Stores error messages
   const [isUploading, setIsUploading] = useState(false); // Tracks image upload status
-
-  const GitHubRepoList = () => {
-    const { getGitHubRepos } = useGlobalContext();
-  
-    useEffect(() => {
-      getGitHubRepos(); // Call function on mount
-    }, []);
-  
-    return <div>GitHub repo lekérés folyamatban...</div>;
-  };
+  const { TokenUrl } = useGlobalContext();
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -56,7 +47,7 @@ const AddEvent = ({ onAddEvent }) => {
           },
           {
             headers: {
-              Authorization: `Bearer YOUR_TOKEN_HERE`, // Replace with actual token or dynamic fetching logic
+              Authorization: `Bearer ${TokenUrl}`,
               'Content-Type': 'application/json'
             }
           }

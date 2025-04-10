@@ -15,7 +15,7 @@ export const GlobalProvider = ({ children }) => {
   const [loggedIn, setLoggedIn] = useState(false);
   const [loggedUserName, setLoggedUserName] = useState("");
 
-  // Alap API URL-ek
+  // Fallbacks provided in case environment variables are missing
   const [apiUrl] = useState(
     () =>
       process.env.REACT_APP_API_URL ||
@@ -26,22 +26,11 @@ export const GlobalProvider = ({ children }) => {
       process.env.REACT_APP_FTP_URL ||
       "https://esemenyrendezo.onrender.com/"
   );
-
-  // 🔄 GitHub repo lekérő függvény
-  const getGitHubRepos = async () => {
-    try {
-      const response = await fetch(`https://github.com/Gabor35/Images`);
-      if (!response.ok) {
-        throw new Error("GitHub repo fetch failed");
-      }
-      const data = await response.json();
-      console.log("GitHub repos:", data); // vagy set state
-      return data;
-    } catch (error) {
-      console.error("Hiba a GitHub API hívás közben:", error);
-      return null;
-    }
-  };
+  const [TokenUrl] = useState(
+    () =>
+      process.env.REACT_APP_GITHUB_TOKEN ||
+      "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"
+  );
 
   return (
     <GlobalContext.Provider
@@ -54,7 +43,7 @@ export const GlobalProvider = ({ children }) => {
         setLoggedUserName,
         apiUrl,
         ftpUrl,
-        getGitHubRepos, // << elérhető más komponensekből
+        TokenUrl,
       }}
     >
       {children}
