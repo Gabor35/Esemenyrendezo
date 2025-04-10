@@ -16,6 +16,15 @@ export const EventList = ({ events, isGridView }) => {
   const userData = JSON.parse(localStorage.getItem('felhasz'));
   const token = userData ? userData.token : null;
 
+  // Ensure the page reloads only once
+  useEffect(() => {
+    const hasRefreshed = sessionStorage.getItem("hasRefreshed");
+    if (!hasRefreshed) {
+      sessionStorage.setItem("hasRefreshed", "true");
+      window.location.reload();
+    }
+  }, []);
+
   useEffect(() => {
     const checkSavedEvents = async () => {
       if (!token || !events.length) return;
