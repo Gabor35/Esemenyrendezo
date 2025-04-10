@@ -1,35 +1,34 @@
-// src/jsx/App.jsx
-import React, { useState, useEffect } from "react";
 import { GlobalProvider } from "../Context/GlobalContext";
+import React, { useState, useEffect } from "react";
 import { BrowserRouter as Router, Routes, Route, NavLink, useLocation } from "react-router-dom";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "bootstrap/dist/js/bootstrap.bundle.min";
 import { motion } from "framer-motion";
-
 import { Login } from "../UsersLogin/Login";
 import { Register } from "../UsersLogin/Register";
 import ForgotPassword from "./ForgotPassword";
 import AddEvent from "./AddEvent";
 import { EventList } from "./EventList";
-import Esemenyek from "./Esemenyek";
+import logo from "../pictures/logo.jpg";
+import hatterGif from "../pictures/background.jpg";
 import Chat from "./chat";
 import { Calendar } from "./calendar";
 import { Saved } from "./saved";
+import Esemenyek from "./Esemenyek";
+import axios from "axios";
 import Aboutus from "./aboutus";
 import Profile from "./profile";
-
-import logo from "../pictures/logo.jpg";
-import hatterGif from "../pictures/background.jpg";
 import gear from "../pictures/gear-fill.svg";
 import gridIcon from "../pictures/grid.svg";
 import listIcon from "../pictures/card-list.svg";
-import axios from "axios";
 
-// Setup axios Authorization header using token stored in localStorage
+
+//https://www.booking.com/searchresults.hu.html?label=msn-tUXtx_K*PI_SVt3q3YLZDg-79989658705990%3Atikwd-79989834340534%3Aloc-88%3Aneo%3Amte%3Alp141771%3Adec%3Aqshotel+oldalak&utm_source=bing&utm_medium=cpc&utm_term=tUXtx_K*PI_SVt3q3YLZDg&utm_content=Booking+-+Desktop&utm_campaign=Hungarian_Hungary+HU+HU&aid=2369666&dest_id=-553173&dest_type=city&group_adults=2&req_adults=2&no_rooms=1&group_children=0&req_children=0
+
 const setupAxiosDefaults = () => {
-  const userData = JSON.parse(localStorage.getItem("felhasz"));
+  const userData = JSON.parse(localStorage.getItem('felhasz'));
   if (userData?.token) {
-    axios.defaults.headers.common["Authorization"] = `Bearer ${userData.token}`;
+    axios.defaults.headers.common['Authorization'] = `Bearer ${userData.token}`;
   }
 };
 
@@ -41,15 +40,13 @@ const AppContent = () => {
   const [filterTime, setFilterTime] = useState("");
   const [filterLocation, setFilterLocation] = useState("");
   const [filterName, setFilterName] = useState("");
+  const location = useLocation();
   const [showLogout, setShowLogout] = useState(false);
   const [showDropdown, setShowDropdown] = useState(false);
+  const isEventListPage = location.pathname === "/events";
   const [isGridView, setIsGridView] = useState(true);
 
-  // Determine if current path is the main event page for conditional UI elements
-  const location = useLocation();
-  const isEventListPage = location.pathname === "/events";
-
-  // On component mount, check for logged in user and fetch events from backend
+  // Ellenőrizzük, hogy a felhasználó be van-e jelentkezve a localStorage-ból
   useEffect(() => {
     const storedUser = JSON.parse(localStorage.getItem("felhasz"));
     if (storedUser) {
@@ -64,10 +61,9 @@ const AppContent = () => {
       .catch((error) => {
         console.error("Error fetching events:", error);
       });
-    setupAxiosDefaults();
+      setupAxiosDefaults();
   }, []);
 
-  // Handler for adding a new event (for modal in /events page)
   const handleAddEvent = (newEvent) => {
     setEvents((prevEvents) => {
       const updatedEvents = [...prevEvents, newEvent];
@@ -77,20 +73,24 @@ const AppContent = () => {
     setIsModalOpen(false);
   };
 
-  // Filter events based on date, time, location, and event name input
   const filteredEvents = events.filter((event) => {
     const isDateMatch = filterDate
-      ? new Date(event.datum).toLocaleDateString() === new Date(filterDate).toLocaleDateString()
+      ? new Date(event.datum).toLocaleDateString() ===
+      new Date(filterDate).toLocaleDateString()
       : true;
+
     const isTimeMatch = filterTime
       ? new Date(event.datum).toLocaleTimeString().includes(filterTime)
       : true;
+
     const isLocationMatch = filterLocation
       ? event.helyszin?.toLowerCase().includes(filterLocation.toLowerCase())
       : true;
+
     const isNameMatch = filterName
       ? event.cime?.toLowerCase().includes(filterName.toLowerCase())
       : true;
+
     return isDateMatch && isTimeMatch && isLocationMatch && isNameMatch;
   });
 
@@ -130,16 +130,26 @@ const AppContent = () => {
               {user && (
                 <>
                   <li className="nav-item">
-                    <motion.div whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }}>
+                    <motion.div
+                      whileHover={{ scale: 1.1 }}
+                      whileTap={{ scale: 0.9 }}
+                    >
                       <NavLink
                         to="/events"
-                        style={{ backgroundColor: "transparent", border: "none", color: "black" }}
-                        className={({ isActive }) => "nav-link" + (isActive ? " active" : "")}
+                        style={{
+                          backgroundColor: "transparent",
+                          border: "none",
+                          color: "black",
+                        }}
+                        className={({ isActive }) =>
+                          "nav-link" + (isActive ? " active" : "")
+                        }
                       >
                         Eseményrendező
                       </NavLink>
                     </motion.div>
                   </li>
+
                   {isEventListPage && (
                     <>
                       <li className="nav-item">
@@ -154,11 +164,20 @@ const AppContent = () => {
                         </motion.button>
                       </li>
                       <li className="nav-item">
-                        <motion.div whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }}>
+                        <motion.div
+                          whileHover={{ scale: 1.1 }}
+                          whileTap={{ scale: 0.9 }}
+                        >
                           <NavLink
                             to="/aboutus"
-                            style={{ backgroundColor: "transparent", border: "none", color: "black" }}
-                            className={({ isActive }) => "nav-link" + (isActive ? " active" : "")}
+                            style={{
+                              backgroundColor: "transparent",
+                              border: "none",
+                              color: "black",
+                            }}
+                            className={({ isActive }) =>
+                              "nav-link" + (isActive ? " active" : "")
+                            }
                           >
                             Rólunk
                           </NavLink>
@@ -166,17 +185,63 @@ const AppContent = () => {
                       </li>
                     </>
                   )}
-                  {/* Optionally, you could add a link here to /esemenyek for event management */}
+
+                  <li
+                    className="nav-item dropdown"
+                    onMouseEnter={() => setShowDropdown(true)}
+                    onMouseLeave={() => setShowDropdown(false)}
+                  >
+                    <motion.button
+                      whileHover={{ scale: 1.1 }}
+                      whileTap={{ scale: 0.9 }}
+                      className="nav-link dropdown-toggle"
+                      style={{
+                        backgroundColor: "transparent",
+                        border: "none",
+                        color: "black",
+                      }}
+                    >
+                      Továbbiak
+                    </motion.button>
+
+                    {showDropdown && (
+                      <motion.ul
+                        className="dropdown-menu show"
+                        initial={{ opacity: 0, y: -10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: -10 }}
+                        transition={{ duration: 0.2 }}
+                      >
+                        <li>
+                          <NavLink to="/chat" className="dropdown-item">
+                            Chat
+                          </NavLink>
+                        </li>
+                        <li>
+                          <NavLink to="/calendar" className="dropdown-item">
+                            Naptár
+                          </NavLink>
+                        </li>
+                        <li>
+                          <NavLink to="/saved" className="dropdown-item">
+                            Mentések
+                          </NavLink>
+                        </li>
+                      </motion.ul>
+                    )}
+                  </li>
                 </>
               )}
             </ul>
             <ul className="navbar-nav ms-auto">
-              {!user ? (
+              {!user ? ( // Ha a felhasználó nincs bejelentkezve
                 <>
                   <li className="nav-item">
                     <NavLink
                       to="/login"
-                      className={({ isActive }) => "nav-link" + (isActive ? " active" : "")}
+                      className={({ isActive }) =>
+                        "nav-link" + (isActive ? " active" : "")
+                      }
                     >
                       <span className="btn btn-light">Bejelentkezés</span>
                     </NavLink>
@@ -184,14 +249,17 @@ const AppContent = () => {
                   <li className="nav-item">
                     <NavLink
                       to="/register"
-                      className={({ isActive }) => "nav-link" + (isActive ? " active" : "")}
+                      className={({ isActive }) =>
+                        "nav-link" + (isActive ? " active" : "")
+                      }
                     >
                       <span className="btn btn-light">Regisztráció</span>
                     </NavLink>
                   </li>
                 </>
               ) : (
-                <li className="nav-item position-relative d-flex align-items-center">
+                <li className="nav-item position-relative d-flex align-items-center"
+>
                   <motion.img
                     src={gear}
                     alt="Beállítások"
@@ -200,6 +268,7 @@ const AppContent = () => {
                     animate={showLogout ? { rotate: 360 } : { rotate: 0 }}
                     transition={{ duration: 1, ease: "easeInOut" }}
                   />
+
                   {showLogout && (
                     <motion.div
                       initial={{ opacity: 0, y: -10 }}
@@ -207,7 +276,12 @@ const AppContent = () => {
                       exit={{ opacity: 0, y: -10 }}
                       transition={{ duration: 0.2 }}
                       className="position-absolute bg-white shadow p-2 rounded"
-                      style={{ right: 0, top: "35px", minWidth: "150px", zIndex: 10 }}
+                      style={{
+                        right: 0,
+                        top: "35px",
+                        minWidth: "150px",
+                        zIndex: 10,
+                      }}
                     >
                       <NavLink to="/profile" className="btn btn-primary w-100 mb-2">
                         Fiók
@@ -232,26 +306,29 @@ const AppContent = () => {
       </nav>
 
       <div className="container mt-4">
-        {/* Only show filter controls when on the main events page */}
+        {/* Only show filter controls when on the events page */}
+
         {isEventListPage && (
           <div className="row mb-4">
             <div className="col-12">
               <div className="p-3 bg-light rounded shadow-sm">
                 <div className="d-flex flex-row align-items-center gap-3">
+                  {/* List/Grid View Button moved to front */}
                   <motion.button
                     className="btn"
                     onClick={() => setIsGridView(!isGridView)}
                     whileHover={{ scale: 1.1 }}
                     whileTap={{ scale: 0.9 }}
                     transition={{ duration: 0.2 }}
-                    style={{ width: "40px", height: "40px", padding: "8px", flexShrink: 0 }}
+                    style={{ width: '40px', height: '40px', padding: '8px', flexShrink: 0 }}
                   >
                     <img
                       src={isGridView ? listIcon : gridIcon}
                       alt={isGridView ? "List View" : "Grid View"}
-                      style={{ width: "100%", height: "100%" }}
+                      style={{ width: '100%', height: '100%' }}
                     />
                   </motion.button>
+
                   <div className="flex-grow-1">
                     <input
                       type="date"
@@ -288,6 +365,8 @@ const AppContent = () => {
                       onChange={(e) => setFilterName(e.target.value)}
                     />
                   </div>
+
+                  {/* Clear Filters Button */}
                   <motion.button
                     className="btn btn-secondary"
                     onClick={() => {
@@ -314,30 +393,21 @@ const AppContent = () => {
             path="/events"
             element={<EventList events={filteredEvents} isGridView={isGridView} />}
           />
-          <Route path="/esemenyek" element={<Esemenyek />} />
           <Route path="/" element={<Login />} />
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
           <Route path="/forgotpassword" element={<ForgotPassword />} />
+          <Route path="/events" element={<Esemenyek />} />
           <Route path="/chat" element={<Chat />} />
           <Route path="/calendar" element={<Calendar />} />
           <Route path="/saved" element={<Saved />} />
           <Route path="/aboutus" element={<Aboutus />} />
           <Route path="/profile" element={<Profile />} />
-          {/* Fallback route for unmatched paths */}
-          <Route
-            path="*"
-            element={
-              <div style={{ padding: "2rem" }}>
-                <h1>404 - Oldal nem található</h1>
-                <p>A keresett oldal nem létezik.</p>
-              </div>
-            }
-          />
+          <Route path="*" element={<Login />} />
         </Routes>
       </div>
 
-      {/* Modal for adding an event; appears only on /events page */}
+      {/* A modális ablak */}
       {isModalOpen && (
         <div className="modal show" tabIndex="-1" style={{ display: "block" }}>
           <div className="modal-dialog">
