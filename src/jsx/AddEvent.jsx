@@ -50,28 +50,32 @@ const AddEvent = ({ onAddEvent }) => {
     setError('');
     const newEventObj = { ...newEvent, id: Date.now() };
 
-    // If an image is selected, upload it to ImgBB and get the URL
+    // If an image is selected, upload it to Cloudinary and get the URL
     if (imageFile && imageFile.name) {
       const formData = new FormData();
-      formData.append('image', imageFile);
-      const response = await axios.post('https://api.imgbb.com/1/upload?key=1c509091d399d7098cea0071d876ab47', formData); // imgbb api kulcs
-      const imageURL = response.data.data.url;
+      formData.append('file', imageFile);
+      formData.append('upload_preset', 'esemenyek');  // Cloudinary upload preset
+      formData.append('cloud_name', 'darnx8tnf');  // Cloudinary cloud name
 
-      if (!imageURL) {
-        setError("Hiba történt a kép feltöltése során.");
-        return;
-      }
-
-      const updatedEvent = { ...newEventObj, Kepurl: imageURL };
-
-      // Add event to Firestore
+      // Cloudinary API call to upload the image
       try {
-        await addDoc(collection(db, 'events'), updatedEvent);  // 'events' is the Firestore collection
+        const response = await axios.post('https://api.cloudinary.com/v1_1/darnx8tnf/image/upload', formData);
+        const imageURL = response.data.secure_url;
+
+        if (!imageURL) {
+          setError("Hiba történt a kép feltöltése során.");
+          return;
+        }
+
+        const updatedEvent = { ...newEventObj, Kepurl: imageURL };
+
+        // Add event to Firestore
+        await addDoc(collection(db, 'events'), updatedEvent);
         onAddEvent(updatedEvent);
         resetForm();
-      } catch (e) {
-        console.error("Error adding document: ", e);
-        setError("Hiba történt az esemény mentésekor.");
+      } catch (error) {
+        console.error("Cloudinary upload error:", error);
+        setError("Hiba történt a kép feltöltése során.");
       }
     } else {
       // Add event to Firestore without an image
