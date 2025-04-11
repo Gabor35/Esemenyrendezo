@@ -1,60 +1,166 @@
-import React, { useEffect, useState } from 'react';
-import { db } from './firebase2'; // Importáljuk a Firestore kapcsolatot
-import { collection, getDocs, query, orderBy } from 'firebase/firestore';
+import React, { useState, useEffect } from 'react';
+import { useGlobalContext } from '../Context/GlobalContext';
+import { Modal } from 'react-bootstrap';
+import axios from 'axios';
+import { motion, AnimatePresence } from 'framer-motion';
+import heartIcon from '../pictures/heart.svg';
+import heartFillIcon from '../pictures/heart-fill.svg';
+import { listenForMessages } from './firebase';  // Firebase üzenet figyelés importálása
 
-const EventList = () => {
-  const [events, setEvents] = useState([]); // Az események tárolása a state-ben
-  const [loading, setLoading] = useState(true); // Betöltési állapot kezelése
-  const [error, setError] = useState(''); // Hiba kezelése
+export const EventList = ({ events, isGridView }) => {
+  const [selectedEvent, setSelectedEvent] = useState(null);
+  const [showModal, setShowModal] = useState(false);
+  const [filledHearts, setFilledHearts] = useState({});
+  const [initialLoadDone, setInitialLoadDone] = useState(false);
+  const [messages, setMessages] = useState([]); // Az üzenetek tárolása
+  const { ftpUrl, apiUrl } = useGlobalContext();
 
-  // Az események lekérése a Firestore-ból
+  const userData = JSON.parse(localStorage.getItem('felhasz'));
+  const token = userData ? userData.token : null;
+
+  // Firebase chat üzenetek figyelése
   useEffect(() => {
-    const fetchEvents = async () => {
+    listenForMessages(setMessages); // Az üzenetek figyelése
+
+    const checkSavedEvents = async () => {
+      if (!token || !events.length || initialLoadDone) return;
       try {
-        // Események lekérése a Firestore-ból, és rendezés dátum szerint
-        const q = query(collection(db, 'events'), orderBy('Datum', 'desc'));
-        const querySnapshot = await getDocs(q);
-
-        // A dokumentumok tömbjének kigyűjtése
-        const eventsData = querySnapshot.docs.map(doc => ({
-          id: doc.id,
-          ...doc.data()
-        }));
-
-        setEvents(eventsData);
-        setLoading(false);
-      } catch (e) {
-        console.error("Hiba történt az események lekérésekor: ", e);
-        setError('Hiba történt az események betöltése során');
-        setLoading(false);
+        const savedHearts = {};
+        for (const event of events) {
+          const response = await axios.get(`${apiUrl}Reszvetel/check/${token}/${event.id}`);
+          savedHearts[event.id] = response.data;
+        }
+        setFilledHearts(savedHearts);
+        setInitialLoadDone(true);
+      } catch (error) {
+        console.error('Error checking saved events:', error);
       }
     };
+    checkSavedEvents();
+  }, [events, initialLoadDone, token, apiUrl]);
 
-    fetchEvents();
-  }, []); // Csak egyszer hajtódik végre, amikor a komponens betöltődik
+  const handleHeartClick = async (eventId, e) => {
+    e.preventDefault();
+    if (!token) {
+      alert('You must be logged in to save events');
+      return;
+    }
+    try {
+      if (filledHearts[eventId]) {
+        await axios.delete(`${apiUrl}Reszvetel/${token}/${eventId}`);
+      } else {
+        await axios.post(`${apiUrl}Reszvetel/${token}/${eventId}`);
+      }
+      setFilledHearts(prev => ({ ...prev, [eventId]: !prev[eventId] }));
+    } catch (error) {
+      alert('Error: ' + (error.response?.data || error.message));
+    }
+  };
 
-  if (loading) {
-    return <div>Betöltés...</div>;
-  }
-
-  if (error) {
-    return <div className="alert alert-danger">{error}</div>;
-  }
+  const handleShowDetails = (event) => {
+    setSelectedEvent(event);
+    setShowModal(true);
+  };
 
   return (
-    <div>
-      <h2>Események</h2>
-      <div className="list-group">
-        {events.map(event => (
-          <div key={event.id} className="list-group-item">
-            <h5>{event.Cime}</h5>
-            <p>{event.Helyszin}</p>
-            <p>{new Date(event.Datum.seconds * 1000).toLocaleString()}</p>
-            {event.Kepurl && <img src={event.Kepurl} alt={event.Cime} style={{ maxWidth: '200px' }} />}
-            <p>{event.Leiras}</p>
-          </div>
-        ))}
+    <div className="container mt-4">
+      <AnimatePresence>
+        <motion.div
+          key={isGridView ? "grid" : "list"}
+          initial={{ opacity: 0, scale: 0.95 }}
+          animate={{ opacity: 1, scale: 1 }}
+          exit={{ opacity: 0, scale: 0.95 }}
+          transition={{ duration: 0.3 }}
+          className={isGridView ? "row" : "list-group"}
+        >
+          {events.map((event, index) => (
+            <motion.div
+              className={isGridView ? "col-md-4" : "list-group-item d-flex align-items-center mb-3 p-3 border rounded shadow-sm"}
+              key={event.id}
+              initial={{ opacity: 0, y: 50 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -50 }}
+              transition={{ delay: index * 0.1, duration: 0.5 }}
+            >
+              <div className="card mb-3" style={isGridView ? {} : { display: 'flex', flexDirection: 'row', width: '100%' }}>
+                <img
+                  src={`${ftpUrl}${event.kepurl}`}
+                  className={isGridView ? "card-img-top" : "img-thumbnail"}
+                  alt={event.cime}
+                  style={isGridView ? { height: '200px', objectFit: 'cover' } : { maxWidth: '200px', maxHeight: '200px', objectFit: 'cover', marginRight: '15px'}}
+                />
+                <div className="card-body" style={isGridView ? {} : { flex: 1 }}>
+                  <h5 className="card-title">{event.cime}</h5>
+                  <p className="card-text">Dátum: {new Date(event.datum).toLocaleString()}</p>
+                  <p className="card-text">Helyszín: {event.helyszin}</p>
+                  <motion.button
+                    className="btn btn-secondary"
+                    onClick={() => handleShowDetails(event)}
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                  >
+                    Részletek
+                  </motion.button>
+                  <button
+                    style={{ background: 'none', border: 'none', cursor: 'pointer', padding: '5px', marginLeft: '10px' }}
+                    onClick={(e) => handleHeartClick(event.id, e)}
+                  >
+                    <motion.img
+                      src={filledHearts[event.id] ? heartFillIcon : heartIcon}
+                      alt="Heart"
+                      style={{ width: '20px', verticalAlign: 'middle' }}
+                      whileHover={{ scale: 1.2 }}
+                    />
+                  </button>
+                </div>
+              </div>
+            </motion.div>
+          ))}
+        </motion.div>
+      </AnimatePresence>
+
+      {/* Chat üzenetek megjelenítése */}
+      <div>
+        <h2>Chat Üzenetek</h2>
+        <ul>
+          {messages.map((message, index) => (
+            <li key={index}>
+              <strong>{message.userId}: </strong>{message.message}
+            </li>
+          ))}
+        </ul>
       </div>
+
+      <Modal show={showModal} onHide={() => setShowModal(false)}>
+        <Modal.Header closeButton>
+          <Modal.Title>{selectedEvent?.cime}</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          {selectedEvent && (
+            <>
+              <img
+                src={`${ftpUrl}${selectedEvent.kepurl}`}
+                alt={selectedEvent.cime}
+                className="img-fluid mb-3"
+                style={{ width: '100%', objectFit: 'cover' }}
+              />
+              <p><strong>Dátum:</strong> {new Date(selectedEvent.datum).toLocaleString()}</p>
+              <p><strong>Helyszín:</strong> {selectedEvent.helyszin}</p>
+              <p><strong>Leírás:</strong> {selectedEvent.leiras}</p>
+            </>
+          )}
+        </Modal.Body>
+        <Modal.Footer>
+          <motion.button
+            className="btn btn-secondary"
+            onClick={() => setShowModal(false)}
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+          >
+            Bezárás
+          </motion.button>
+        </Modal.Footer>
+      </Modal>
     </div>
   );
 };
