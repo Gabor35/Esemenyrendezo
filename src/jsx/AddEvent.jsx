@@ -2,6 +2,10 @@ import React, { useState } from 'react';
 import { db } from './firebase2';  // Import Firestore
 import { collection, addDoc } from 'firebase/firestore';  // Firestore functions
 import axios from 'axios';
+import { Cloudinary } from '@cloudinary/url-gen';  // Import Cloudinary SDK
+import { auto } from '@cloudinary/url-gen/actions/resize';
+import { autoGravity } from '@cloudinary/url-gen/qualifiers/gravity';
+import { AdvancedImage } from '@cloudinary/react';
 
 const AddEvent = ({ onAddEvent }) => {
   const [newEvent, setNewEvent] = useState({
@@ -14,6 +18,9 @@ const AddEvent = ({ onAddEvent }) => {
 
   const [imageFile, setImageFile] = useState(null);
   const [error, setError] = useState('');
+
+  // Cloudinary instance
+  const cld = new Cloudinary({ cloud: { cloudName: 'darnx8tnf' } });
 
   // Handle form input changes
   const handleInputChange = (e) => {
@@ -57,7 +64,6 @@ const AddEvent = ({ onAddEvent }) => {
       formData.append('upload_preset', 'esemenyek');  // Cloudinary upload preset
       formData.append('cloud_name', 'darnx8tnf');  // Cloudinary cloud name
 
-      // Cloudinary API call to upload the image
       try {
         const response = await axios.post('https://api.cloudinary.com/v1_1/darnx8tnf/image/upload', formData);
         const imageURL = response.data.secure_url;
@@ -158,7 +164,7 @@ const AddEvent = ({ onAddEvent }) => {
           />
           {newEvent.Kepurl && (
             <div className="mt-3">
-              <img src={newEvent.Kepurl} alt="Esemény kép" style={{ maxWidth: '200px' }} />
+              <AdvancedImage cldImg={cld.image(newEvent.Kepurl).resize(auto().gravity(autoGravity()).width(500).height(500))} />
             </div>
           )}
         </div>
