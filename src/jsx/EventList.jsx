@@ -49,7 +49,7 @@ const EventList = () => {
           <div key={event.id} className="list-group-item">
             <h5>{event.Cime}</h5>
             <p>{event.Helyszin}</p>
-            <p>{new Date(event.Datum.seconds * 1000).toLocaleString()}</p>
+            <p>{event.Datum?.toDate().toLocaleString()}</p>
             {event.Kepurl && <img src={event.Kepurl} alt={event.Cime} style={{ maxWidth: '200px' }} />}
             <p>{event.Leiras}</p>
           </div>
