@@ -8,7 +8,7 @@ import { Login } from "../UsersLogin/Login";
 import { Register } from "../UsersLogin/Register";
 import ForgotPassword from "./ForgotPassword";
 import AddEvent from "./AddEvent";
-import { EventList } from "./EventList";
+import EventList  from "./EventList";
 import logo from "../pictures/logo.jpg";
 import hatterGif from "../pictures/background.jpg";
 import Chat from "./chat";

@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
-import { uploadImage, saveEvent } from './firebase';
+import { db } from './firebase2';  // Import Firestore
+import { collection, addDoc } from 'firebase/firestore';  // Firestore functions
+import axios from 'axios';
 
 const AddEvent = ({ onAddEvent }) => {
   const [newEvent, setNewEvent] = useState({
@@ -13,6 +15,7 @@ const AddEvent = ({ onAddEvent }) => {
   const [imageFile, setImageFile] = useState(null);
   const [error, setError] = useState('');
 
+  // Handle form input changes
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setNewEvent(prev => ({
@@ -21,6 +24,7 @@ const AddEvent = ({ onAddEvent }) => {
     }));
   };
 
+  // Handle image file input changes
   const handleImageChange = (e) => {
     const file = e.target.files[0];
     if (file && file.type.startsWith("image/")) {
@@ -36,7 +40,8 @@ const AddEvent = ({ onAddEvent }) => {
     }
   };
 
-  const handleAddEvent = () => {
+  // Handle event addition
+  const handleAddEvent = async () => {
     if (!newEvent.Cime || !newEvent.Helyszin || !newEvent.Datum) {
       setError('Minden mezőt ki kell tölteni, kivéve az esemény leírását!');
       return;
@@ -45,22 +50,39 @@ const AddEvent = ({ onAddEvent }) => {
     setError('');
     const newEventObj = { ...newEvent, id: Date.now() };
 
+    // If an image is selected, upload it to ImgBB and get the URL
     if (imageFile && imageFile.name) {
-      uploadImage(imageFile, (imageURL) => {
-        if (!imageURL) {
-          setError("Hiba történt a kép feltöltése során.");
-          return;
-        }
+      const formData = new FormData();
+      formData.append('image', imageFile);
+      const response = await axios.post('https://api.imgbb.com/1/upload?key=1c509091d399d7098cea0071d876ab47', formData); // imgbb api kulcs
+      const imageURL = response.data.data.url;
 
-        const updatedEvent = { ...newEventObj, Kepurl: imageURL };
-        saveEvent(updatedEvent);
+      if (!imageURL) {
+        setError("Hiba történt a kép feltöltése során.");
+        return;
+      }
+
+      const updatedEvent = { ...newEventObj, Kepurl: imageURL };
+
+      // Add event to Firestore
+      try {
+        await addDoc(collection(db, 'events'), updatedEvent);  // 'events' is the Firestore collection
         onAddEvent(updatedEvent);
         resetForm();
-      });
+      } catch (e) {
+        console.error("Error adding document: ", e);
+        setError("Hiba történt az esemény mentésekor.");
+      }
     } else {
-      saveEvent(newEventObj);
-      onAddEvent(newEventObj);
-      resetForm();
+      // Add event to Firestore without an image
+      try {
+        await addDoc(collection(db, 'events'), newEventObj);
+        onAddEvent(newEventObj);
+        resetForm();
+      } catch (e) {
+        console.error("Error adding document: ", e);
+        setError("Hiba történt az esemény mentésekor.");
+      }
     }
   };
 

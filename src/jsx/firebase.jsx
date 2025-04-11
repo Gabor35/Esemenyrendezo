@@ -1,40 +1,13 @@
-import { initializeApp } from 'firebase/app';
-import {
-  getDatabase,
-  ref as dbRef,
-  set,
-  push,
-  onValue
-} from 'firebase/database';
-import {
-  getStorage,
-  ref as storageRef,
-  uploadBytes,
-  getDownloadURL
-} from 'firebase/storage';
-
-// 🔧 Firebase konfiguráció
-const firebaseConfig = {
-  apiKey: "AIzaSyApLu5bmYByHbdzuuQ7Qged9Qj8dpgi570",
-  authDomain: "esemenyrendezo-71f5b.firebaseapp.com",
-  databaseURL: "https://esemenyrendezo-71f5b-default-rtdb.europe-west1.firebasedatabase.app",
-  projectId: "esemenyrendezo-71f5b",
-  storageBucket: "esemenyrendezo-71f5b.firebasestorage.app",
-  messagingSenderId: "185020967631",
-  appId: "1:185020967631:web:a501cb8e6695bda12625ba",
-  measurementId: "G-X9VW5Y4CS4"
-};
-
-// 🚀 Firebase inicializálás
-const app = initializeApp(firebaseConfig);
-const database = getDatabase(app);
-const storage = getStorage(app);
+// firebase.jsx
+import { ref as dbRef, set, push, onValue } from 'firebase/database';
+import { ref as storageRef, uploadBytes, getDownloadURL } from 'firebase/storage';
+import { database, storage } from './firebase2';
 
 // 🔹 Üzenet küldése Firebase-be
 export function sendMessage(messageText, userId) {
   const newMessageRef = push(dbRef(database, 'chats/'));
   set(newMessageRef, {
-    userId: userId,
+    userId,
     message: messageText,
     timestamp: Date.now(),
   });
