@@ -28,7 +28,7 @@ export const Login = () => {
 
   useEffect(() => {
     if (loggedIn) {
-      alert(loggedUser?.name || loginName);
+      alert(loggedUser?.name || loginName + "sikeresen bejelentkezett!");
     }
     const storedUser = JSON.parse(localStorage.getItem("felhasz"));
     if (storedUser) {

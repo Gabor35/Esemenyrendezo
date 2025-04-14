@@ -1,29 +1,37 @@
 import React, { useState, useEffect, useRef } from "react";
 import { motion } from "framer-motion";
 import { sendMessage, listenForMessages } from './firebase';
-import { useGlobalContext } from '../Context/GlobalContext';
 
 const Chat = () => {
-  const { loggedUser, loggedUserName } = useGlobalContext();
   const [messages, setMessages] = useState([]);
   const [newMessage, setNewMessage] = useState("");
+  const [username, setUsername] = useState("Ismeretlen felhasználó");
   const messagesEndRef = useRef(null);
 
+  // 🔹 Get logged-in user's name from localStorage
+  useEffect(() => {
+    const storedUser = JSON.parse(localStorage.getItem("felhasz"));
+    if (storedUser && storedUser.name) {
+      setUsername(storedUser.name);
+    }
+  }, []);
+
+  // 🔹 Listen for incoming messages from Firebase
   useEffect(() => {
     listenForMessages(setMessages);
   }, []);
 
-  // scroll to bottom when messages change
+  // 🔹 Auto-scroll to latest message
   useEffect(() => {
     if (messagesEndRef.current) {
       messagesEndRef.current.scrollIntoView({ behavior: "smooth" });
     }
   }, [messages]);
 
-  const handleSendMessage = async () => {
-    const displayName = loggedUser?.name || loggedUserName;
+  // 🔹 Send a message
+  const handleSendMessage = () => {
     if (newMessage.trim()) {
-      sendMessage(newMessage, displayName);
+      sendMessage(newMessage, username);
       setNewMessage("");
     }
   };
@@ -53,13 +61,13 @@ const Chat = () => {
           {messages.map((message, index) => (
             <motion.div
               key={index}
-              className="mb-3 p-2 rounded bg-light border border-gray-200 shadow-sm"
+              className="mb-3 p-2 rounded bg-white border border-gray-200 shadow-sm"
               initial={{ opacity: 0, x: -10 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.3, delay: index * 0.05 }}
             >
               <div className="d-flex justify-content-between">
-                <strong className={message.userId === (loggedUser?.name || loggedUserName) ? "text-primary" : "text-success"}>
+                <strong className={message.userId === username ? "text-primary" : "text-success"}>
                   {message.userId}
                 </strong>
                 <span className="text-muted small">
