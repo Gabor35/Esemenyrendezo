@@ -50,8 +50,8 @@ const Chat = () => {
               transition={{ duration: 0.3, delay: index * 0.05 }}
             >
               <div className="d-flex justify-content-between">
-                <strong className={message.userId === loggedUser.name ? "text-primary" : "text-success"}>
-                  {message.userId}
+                <strong className={message.loggedUser.name === loggedUser.name ? "text-primary" : "text-success"}>
+                  {message.loggedUser.name}
                 </strong>
                 <span className="text-muted small">
                   {new Date(message.timestamp).toLocaleString()}
