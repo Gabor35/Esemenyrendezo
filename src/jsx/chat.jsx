@@ -4,7 +4,7 @@ import { sendMessage, listenForMessages } from './firebase';
 import { useGlobalContext } from '../Context/GlobalContext';
 
 const Chat = () => {
-  const { loggedUser } = useGlobalContext(); // Gets the username from context
+  const { loggedUserName } = useGlobalContext(); // Gets the username from context
   const [messages, setMessages] = useState([]);
   const [newMessage, setNewMessage] = useState("");
 
@@ -14,11 +14,12 @@ const Chat = () => {
 
   const handleSendMessage = async () => {
     if (newMessage.trim()) {
-      sendMessage(newMessage, loggedUser.name);
+      sendMessage(newMessage, loggedUserName);
       setNewMessage("");
     }
   };
 
+  console.log(loggedUserName);
   return (
     <div className="container mt-5 d-flex justify-content-center">
       <motion.div
@@ -50,8 +51,8 @@ const Chat = () => {
               transition={{ duration: 0.3, delay: index * 0.05 }}
             >
               <div className="d-flex justify-content-between">
-                <strong className={message.loggedUser.name === loggedUser.name ? "text-primary" : "text-success"}>
-                  {message.loggedUser.name}
+                <strong className={message.userId === loggedUserName ? "text-primary" : "text-success"}>
+                  {message.userId}
                 </strong>
                 <span className="text-muted small">
                   {new Date(message.timestamp).toLocaleString()}

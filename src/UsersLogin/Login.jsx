@@ -31,7 +31,7 @@ export const Login = () => {
   // Check for logged-in user on component mount
   useEffect(() => {
     if (loggedIn) {
-      console.log(`${loggedUser.name} sikeresen bejelentkezett!`);
+      alert(`${loggedUser.name} sikeresen bejelentkezett!`);
     }
     const storedUser = JSON.parse(localStorage.getItem("felhasz"));
     if (storedUser) {
