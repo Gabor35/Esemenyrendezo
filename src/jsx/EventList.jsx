@@ -73,6 +73,8 @@ const EventList = ({ isGridView = false }) => {
       } else {
         // ✅ FIXED: add empty body as second parameter
         await axios.post(`${apiUrl}Reszvetel/${token}/${eventId}`, {});
+        console.log('Esemény mentve:', token);
+        console.log('Esemény mentve:', eventId);
       }
       setFilledHearts(prev => ({ ...prev, [eventId]: !prev[eventId] }));
     } catch (error) {
