@@ -4,7 +4,7 @@ import { sendMessage, listenForMessages } from './firebase';
 import { useGlobalContext } from '../Context/GlobalContext';
 
 const Chat = () => {
-  const { loggedUserName } = useGlobalContext(); // Gets the username from context
+  const { loggedUser } = useGlobalContext(); // Gets the username from context
   const [messages, setMessages] = useState([]);
   const [newMessage, setNewMessage] = useState("");
 
@@ -14,7 +14,7 @@ const Chat = () => {
 
   const handleSendMessage = async () => {
     if (newMessage.trim()) {
-      sendMessage(newMessage, loggedUserName);
+      sendMessage(newMessage, loggedUser.name);
       setNewMessage("");
     }
   };
@@ -50,7 +50,7 @@ const Chat = () => {
               transition={{ duration: 0.3, delay: index * 0.05 }}
             >
               <div className="d-flex justify-content-between">
-                <strong className={message.userId === loggedUserName ? "text-primary" : "text-success"}>
+                <strong className={message.userId === loggedUser.name ? "text-primary" : "text-success"}>
                   {message.userId}
                 </strong>
                 <span className="text-muted small">

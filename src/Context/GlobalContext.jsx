@@ -13,7 +13,7 @@ export const GlobalProvider = ({ children }) => {
   });
 
   const [loggedIn, setLoggedIn] = useState(false);
-  const [loggedUserName, setLoggedUserName] = useState("");
+  const [loggedUserName, setLoggedUserName] = useState(loggedUser.name);
 
   // Fallbacks provided in case environment variables are missing
   const [apiUrl] = useState(
