@@ -16,6 +16,10 @@ export const Saved = () => {
   const userData = JSON.parse(localStorage.getItem('felhasz'));
   const token = userData ? userData.token : null;
 
+  const formatError = (err) => {
+    return err.response?.data?.toString?.() || err.message || JSON.stringify(err);
+  };
+
   useEffect(() => {
     const fetchSavedEvents = async () => {
       setLoading(true);
@@ -30,7 +34,7 @@ export const Saved = () => {
         const formatted = response.data.map(event => ({
           ...event,
           Datum: new Date(event.datum),
-          Kepurl: `https://images-0prm.onrender.com/${event.kepurl}`, // Normalize URL
+          Kepurl: `https://images-0prm.onrender.com/${event.kepurl}`,
           Cime: event.cime,
           Helyszin: event.helyszin,
           Leiras: event.leiras
@@ -38,7 +42,7 @@ export const Saved = () => {
         setSavedEvents(formatted);
         setError(null);
       } catch (err) {
-        setError('Nem sikerült lekérni a mentett eseményeket: ' + (err.response?.data || err.message));
+        setError('Nem sikerült lekérni a mentett eseményeket: ' + formatError(err));
         setSavedEvents([]);
       } finally {
         setLoading(false);
@@ -63,7 +67,7 @@ export const Saved = () => {
       await axios.delete(`${apiUrl}Reszvetel/${token}/${eventId}`);
       setSavedEvents(prev => prev.filter(event => event.id !== eventId));
     } catch (err) {
-      setError('Nem sikerült eltávolítani az eseményt: ' + (err.response?.data || err.message));
+      setError('Nem sikerült eltávolítani az eseményt: ' + formatError(err));
     }
   };
 
