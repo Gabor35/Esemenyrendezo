@@ -71,13 +71,15 @@ const EventList = ({ isGridView = false }) => {
       if (filledHearts[eventId]) {
         await axios.delete(`${apiUrl}Reszvetel/${token}/${eventId}`);
       } else {
-        await axios.post(`${apiUrl}Reszvetel/${token}/${eventId}`);
+        // ✅ FIXED: add empty body as second parameter
+        await axios.post(`${apiUrl}Reszvetel/${token}/${eventId}`, {});
       }
       setFilledHearts(prev => ({ ...prev, [eventId]: !prev[eventId] }));
     } catch (error) {
       alert('Hiba: ' + (error.response?.data || error.message));
     }
   };
+  
 
   const handleShowDetails = (event) => {
     setSelectedEvent(event);
