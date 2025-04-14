@@ -1,23 +1,29 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { motion } from "framer-motion";
 import { sendMessage, listenForMessages } from './firebase';
 import { useGlobalContext } from '../Context/GlobalContext';
 
 const Chat = () => {
-  const { loggedUser, loggedUserName } = useGlobalContext(); // 🔹 get both full user and the display name
+  const { loggedUser, loggedUserName } = useGlobalContext();
   const [messages, setMessages] = useState([]);
   const [newMessage, setNewMessage] = useState("");
+  const messagesEndRef = useRef(null);
 
   useEffect(() => {
     listenForMessages(setMessages);
   }, []);
 
-  // ✅ Debug console.log
-  console.log("👤 loggedUser.name:", loggedUser?.name || loggedUserName);
+  // scroll to bottom when messages change
+  useEffect(() => {
+    if (messagesEndRef.current) {
+      messagesEndRef.current.scrollIntoView({ behavior: "smooth" });
+    }
+  }, [messages]);
 
   const handleSendMessage = async () => {
+    const displayName = loggedUser?.name || loggedUserName;
     if (newMessage.trim()) {
-      sendMessage(newMessage, loggedUserName);
+      sendMessage(newMessage, displayName);
       setNewMessage("");
     }
   };
@@ -53,7 +59,7 @@ const Chat = () => {
               transition={{ duration: 0.3, delay: index * 0.05 }}
             >
               <div className="d-flex justify-content-between">
-                <strong className={message.userId === loggedUserName ? "text-primary" : "text-success"}>
+                <strong className={message.userId === (loggedUser?.name || loggedUserName) ? "text-primary" : "text-success"}>
                   {message.userId}
                 </strong>
                 <span className="text-muted small">
@@ -63,6 +69,7 @@ const Chat = () => {
               <p className="mt-2 mb-0">{message.message}</p>
             </motion.div>
           ))}
+          <div ref={messagesEndRef} />
         </div>
 
         <div className="mt-3 d-flex gap-2">
