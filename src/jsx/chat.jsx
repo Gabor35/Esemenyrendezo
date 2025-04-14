@@ -4,13 +4,16 @@ import { sendMessage, listenForMessages } from './firebase';
 import { useGlobalContext } from '../Context/GlobalContext';
 
 const Chat = () => {
-  const { loggedUserName } = useGlobalContext(); // Gets the username from context
+  const { loggedUser, loggedUserName } = useGlobalContext(); // 🔹 get both full user and the display name
   const [messages, setMessages] = useState([]);
   const [newMessage, setNewMessage] = useState("");
 
   useEffect(() => {
     listenForMessages(setMessages);
   }, []);
+
+  // ✅ Debug console.log
+  console.log("👤 loggedUser.name:", loggedUser?.name || loggedUserName);
 
   const handleSendMessage = async () => {
     if (newMessage.trim()) {
@@ -19,7 +22,6 @@ const Chat = () => {
     }
   };
 
-  console.log(loggedUserName);
   return (
     <div className="container mt-5 d-flex justify-content-center">
       <motion.div
