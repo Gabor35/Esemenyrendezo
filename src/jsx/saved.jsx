@@ -1,9 +1,9 @@
-import React, { useState, useEffect } from "react";
-import { Modal } from "react-bootstrap";
-import axios from "axios";
-import { useGlobalContext } from "../Context/GlobalContext";
-import { motion } from "framer-motion";
-import heartFillIcon from "../pictures/heart-fill.svg";
+import React, { useState, useEffect } from 'react';
+import { Modal } from 'react-bootstrap';
+import axios from 'axios';
+import { useGlobalContext } from '../Context/GlobalContext';
+import { motion } from 'framer-motion';
+import heartFillIcon from '../pictures/heart-fill.svg';
 
 export const Saved = () => {
   const [savedEvents, setSavedEvents] = useState([]);
@@ -13,7 +13,7 @@ export const Saved = () => {
   const [showModal, setShowModal] = useState(false);
   const { apiUrl } = useGlobalContext();
 
-  const userData = JSON.parse(localStorage.getItem("felhasz"));
+  const userData = JSON.parse(localStorage.getItem('felhasz'));
   const token = userData ? userData.token : null;
 
   const formatError = (err) => {
@@ -25,24 +25,24 @@ export const Saved = () => {
       setLoading(true);
       try {
         if (!token) {
-          setError("Be kell jelentkezned a mentett események megtekintéséhez");
+          setError('Be kell jelentkezned a mentett események megtekintéséhez');
           setLoading(false);
           return;
         }
 
         const response = await axios.get(`${apiUrl}Reszvetel/saved/${token}`);
-        const formatted = response.data.map((event) => ({
+        const formatted = response.data.map(event => ({
           ...event,
           Datum: new Date(event.datum),
           Kepurl: `https://images-0prm.onrender.com/${event.kepurl}`,
           Cime: event.cime,
           Helyszin: event.helyszin,
-          Leiras: event.leiras,
+          Leiras: event.leiras
         }));
         setSavedEvents(formatted);
         setError(null);
       } catch (err) {
-        setError("Nem sikerült lekérni a mentett eseményeket: " + formatError(err));
+        setError('Nem sikerült lekérni a mentett eseményeket: ' + formatError(err));
         setSavedEvents([]);
       } finally {
         setLoading(false);
@@ -60,14 +60,14 @@ export const Saved = () => {
   const handleUnsaveEvent = async (eventId, e) => {
     e.preventDefault();
     if (!token) {
-      setError("Be kell jelentkezned az esemény eltávolításához");
+      setError('Be kell jelentkezned az esemény eltávolításához');
       return;
     }
     try {
       await axios.delete(`${apiUrl}Reszvetel/${token}/${eventId}`);
-      setSavedEvents((prev) => prev.filter((event) => event.id !== eventId));
+      setSavedEvents(prev => prev.filter(event => event.id !== eventId));
     } catch (err) {
-      setError("Nem sikerült eltávolítani az eseményt: " + formatError(err));
+      setError('Nem sikerült eltávolítani az eseményt: ' + formatError(err));
     }
   };
 
@@ -81,10 +81,7 @@ export const Saved = () => {
 
   if (savedEvents.length === 0) {
     return (
-      <div
-        className="container mt-4 d-flex justify-content-center align-items-center"
-        style={{ height: "100vh", fontSize: "30px" }}
-      >
+      <div className="container mt-4 d-flex justify-content-center align-items-center" style={{ height: "100vh", fontSize: "30px" }}>
         <div className="text-white">Nincsenek mentések!</div>
       </div>
     );
@@ -107,7 +104,7 @@ export const Saved = () => {
                   src={event.Kepurl}
                   className="card-img-top"
                   alt={event.Cime}
-                  style={{ height: "200px", objectFit: "cover" }}
+                  style={{ height: '200px', objectFit: 'cover' }}
                 />
               )}
               <div className="card-body">
@@ -122,15 +119,15 @@ export const Saved = () => {
                 >
                   Részletek
                 </motion.button>
-                <div style={{ display: "inline-block", marginLeft: "10px" }}>
+                <div style={{ display: 'inline-block', marginLeft: '10px' }}>
                   <button
-                    style={{ background: "none", border: "none", cursor: "pointer", padding: "5px" }}
+                    style={{ background: 'none', border: 'none', cursor: 'pointer', padding: '5px' }}
                     onClick={(e) => handleUnsaveEvent(event.id, e)}
                   >
                     <motion.img
                       src={heartFillIcon}
                       alt="Unsave"
-                      style={{ width: "20px", verticalAlign: "middle" }}
+                      style={{ width: '20px', verticalAlign: 'middle' }}
                       whileHover={{ scale: 1.2 }}
                     />
                   </button>
@@ -151,18 +148,12 @@ export const Saved = () => {
               src={selectedEvent.Kepurl}
               alt={selectedEvent.Cime}
               className="img-fluid mb-3"
-              style={{ width: "100%", objectFit: "cover" }}
+              style={{ width: '100%', objectFit: 'cover' }}
             />
           )}
-          <p>
-            <strong>Dátum:</strong> {new Date(selectedEvent?.Datum).toLocaleString()}
-          </p>
-          <p>
-            <strong>Helyszín:</strong> {selectedEvent?.Helyszin}
-          </p>
-          <p>
-            <strong>Leírás:</strong> {selectedEvent?.Leiras}
-          </p>
+          <p><strong>Dátum:</strong> {new Date(selectedEvent?.Datum).toLocaleString()}</p>
+          <p><strong>Helyszín:</strong> {selectedEvent?.Helyszin}</p>
+          <p><strong>Leírás:</strong> {selectedEvent?.Leiras}</p>
         </Modal.Body>
         <Modal.Footer>
           <motion.button

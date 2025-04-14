@@ -15,17 +15,20 @@ export const GlobalProvider = ({ children }) => {
   const [loggedIn, setLoggedIn] = useState(false);
   const [loggedUserName, setLoggedUserName] = useState(loggedUser.name);
 
-  // Fallback values in case environment variables are missing
+  // Fallbacks provided in case environment variables are missing
   const [apiUrl] = useState(
-    process.env.REACT_APP_API_URL ||
+    () =>
+      process.env.REACT_APP_API_URL ||
       "https://esemenyrendezo1.azurewebsites.net/api/"
   );
   const [ftpUrl] = useState(
-    process.env.REACT_APP_FTP_URL ||
+    () =>
+      process.env.REACT_APP_FTP_URL ||
       "https://esemenyrendezo.onrender.com/"
   );
   const [TokenUrl] = useState(
-    process.env.REACT_APP_GITHUB_TOKEN ||
+    () =>
+      process.env.REACT_APP_GITHUB_TOKEN ||
       "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"
   );
 
