@@ -1,11 +1,6 @@
 import React, { useState } from 'react';
-import { db } from './firebase2';  // Import Firestore
-import { collection, addDoc } from 'firebase/firestore';  // Firestore functions
-import axios from 'axios';
-import { Cloudinary } from '@cloudinary/url-gen';  // Import Cloudinary SDK
-import { auto } from '@cloudinary/url-gen/actions/resize';
-import { autoGravity } from '@cloudinary/url-gen/qualifiers/gravity';
-import { AdvancedImage } from '@cloudinary/react';
+import { db } from './firebase2'; // Import Firestore
+import { collection, addDoc } from 'firebase/firestore';
 
 const AddEvent = ({ onAddEvent }) => {
   const [newEvent, setNewEvent] = useState({
@@ -15,14 +10,9 @@ const AddEvent = ({ onAddEvent }) => {
     Leiras: '',
     Kepurl: ''
   });
-
-  const [imageFile, setImageFile] = useState(null);
   const [error, setError] = useState('');
 
-  // Cloudinary instance
-  const cld = new Cloudinary({ cloud: { cloudName: 'darnx8tnf' } });
-
-  // Handle form input changes
+  // Handle form input changes for all fields (including the image URL)
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setNewEvent(prev => ({
@@ -31,23 +21,7 @@ const AddEvent = ({ onAddEvent }) => {
     }));
   };
 
-  // Handle image file input changes
-  const handleImageChange = (e) => {
-    const file = e.target.files[0];
-    if (file && file.type.startsWith("image/")) {
-      const imageUrl = URL.createObjectURL(file);
-      setImageFile(file);
-      setNewEvent(prev => ({
-        ...prev,
-        Kepurl: imageUrl
-      }));
-    } else {
-      setError("Csak érvényes képfájlt lehet feltölteni.");
-      setImageFile(null);
-    }
-  };
-
-  // Handle event addition
+  // Handle adding the event to Firestore
   const handleAddEvent = async () => {
     if (!newEvent.Cime || !newEvent.Helyszin || !newEvent.Datum) {
       setError('Minden mezőt ki kell tölteni, kivéve az esemény leírását!');
@@ -57,45 +31,18 @@ const AddEvent = ({ onAddEvent }) => {
     setError('');
     const newEventObj = { ...newEvent, id: Date.now() };
 
-    // If an image is selected, upload it to Cloudinary and get the URL
-    if (imageFile && imageFile.name) {
-      const formData = new FormData();
-      formData.append('file', imageFile);
-      formData.append('upload_preset', 'esemenyek');  // Cloudinary upload preset
-      formData.append('cloud_name', 'darnx8tnf');  // Cloudinary cloud name
-
-      try {
-        const response = await axios.post('https://api.cloudinary.com/v1_1/darnx8tnf/image/upload', formData);
-        const imageURL = response.data.secure_url;
-
-        if (!imageURL) {
-          setError("Hiba történt a kép feltöltése során.");
-          return;
-        }
-
-        const updatedEvent = { ...newEventObj, Kepurl: imageURL };
-
-        // Add event to Firestore
-        await addDoc(collection(db, 'events'), updatedEvent);
-        onAddEvent(updatedEvent);
-        resetForm();
-      } catch (error) {
-        console.error("Cloudinary upload error:", error);
-        setError("Hiba történt a kép feltöltése során.");
-      }
-    } else {
-      // Add event to Firestore without an image
-      try {
-        await addDoc(collection(db, 'events'), newEventObj);
-        onAddEvent(newEventObj);
-        resetForm();
-      } catch (e) {
-        console.error("Error adding document: ", e);
-        setError("Hiba történt az esemény mentésekor.");
-      }
+    try {
+      // Add event to Firestore
+      await addDoc(collection(db, 'events'), newEventObj);
+      onAddEvent(newEventObj);
+      resetForm();
+    } catch (e) {
+      console.error("Error adding document: ", e);
+      setError("Hiba történt az esemény mentésekor.");
     }
   };
 
+  // Reset form fields
   const resetForm = () => {
     setNewEvent({
       Cime: '',
@@ -104,12 +51,11 @@ const AddEvent = ({ onAddEvent }) => {
       Leiras: '',
       Kepurl: ''
     });
-    setImageFile(null);
     setError('');
   };
 
   return (
-    <div>
+    <div className="event-container" style={{ margin: '20px' }}>
       <form>
         <div className="mb-3">
           <input
@@ -154,17 +100,23 @@ const AddEvent = ({ onAddEvent }) => {
         </div>
 
         <div className="mb-3">
-          <label htmlFor="imageUpload" className="form-label">Válassz képet</label>
+          {/* Image URL input field */}
           <input
-            type="file"
-            id="imageUpload"
+            type="text"
+            name="Kepurl"
+            value={newEvent.Kepurl}
+            onChange={handleInputChange}
             className="form-control"
-            onChange={handleImageChange}
-            accept="image/*"
+            placeholder="Kép URL-je"
           />
+          {/* Display image preview if image URL is provided */}
           {newEvent.Kepurl && (
             <div className="mt-3">
-              <AdvancedImage cldImg={cld.image(newEvent.Kepurl).resize(auto().gravity(autoGravity()).width(500).height(500))} />
+              <img
+                src={newEvent.Kepurl}
+                alt="Esemény előnézet"
+                style={{ width: '500px', height: '500px', objectFit: 'cover' }}
+              />
             </div>
           )}
         </div>
