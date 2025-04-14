@@ -4,7 +4,7 @@ import { getFirestore } from 'firebase/firestore';
 import { getDatabase } from 'firebase/database';
 import { getStorage } from 'firebase/storage';
 
-// Firebase konfiguráció
+// Firebase config
 const firebaseConfig = {
   apiKey: "AIzaSyApLu5bmYByHbdzuuQ7Qged9Qj8dpgi570",
   authDomain: "esemenyrendezo-71f5b.firebaseapp.com",
@@ -16,12 +16,12 @@ const firebaseConfig = {
   measurementId: "G-8M407FEJEP"
 };
 
-// Inicializálás
+// Initialize Firebase only once
 if (!getApps().length) {
   initializeApp(firebaseConfig);
 }
 
-// Exportálás
+// Exports
 const db = getFirestore();
 const database = getDatabase();
 const storage = getStorage();
