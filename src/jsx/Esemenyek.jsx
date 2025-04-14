@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
+import { Button, Form, Container, Row, Col } from "react-bootstrap";
 
 const Esemenyek = () => {
   const [esemenyek, setEsemenyek] = useState([]);
@@ -15,8 +16,6 @@ const Esemenyek = () => {
   const token = "YOUR_API_TOKEN";
 
   useEffect(() => {
-    let url = "https://esemenyrendezo1.azurewebsites.net/api/Esemeny/" + token;
-    alert(url);
     axios
       .get(`/api/Esemeny/${token}`)
       .then((response) => {
@@ -87,91 +86,145 @@ const Esemenyek = () => {
   };
 
   return (
-    <div>
-      <h1>Események</h1>
+    <Container className="my-5">
+      <h1 className="text-center mb-4">Események</h1>
 
       {/* Event list */}
-      <div>
+      <Row>
         {esemenyek.map((event) => (
-          <div key={event.Id}>
-            <h3>{event.cime}</h3>
-            <p>{event.helyszin}</p>
-            <p>{new Date(event.datum).toLocaleString()}</p>
-            <p>{event.leiras}</p>
-            <button onClick={() => handleEditEvent(event)}>Szerkesztés</button>
-            <button onClick={() => handleDeleteEvent(event.id)}>Törlés</button>
-          </div>
+          <Col sm={12} md={6} lg={4} key={event.Id} className="mb-4">
+            <div className="card p-3 shadow-sm">
+              <h5>{event.cime}</h5>
+              <p>{event.helyszin}</p>
+              <p>{new Date(event.datum).toLocaleString()}</p>
+              <p>{event.leiras}</p>
+              <Button
+                variant="primary"
+                className="me-2"
+                onClick={() => handleEditEvent(event)}
+              >
+                Szerkesztés
+              </Button>
+              <Button
+                variant="danger"
+                onClick={() => handleDeleteEvent(event.id)}
+              >
+                Törlés
+              </Button>
+            </div>
+          </Col>
         ))}
-      </div>
+      </Row>
 
       {/* Add new event */}
       <h2>Új Esemény</h2>
-      <form onSubmit={handleAddEvent}>
-        <input
-          type="text"
-          name="cime"
-          value={newEvent.cime}
-          onChange={handleInputChange}
-          placeholder="Esemény címe"
-        />
-        <input
-          type="text"
-          name="helyszin"
-          value={newEvent.helyszin}
-          onChange={handleInputChange}
-          placeholder="Helyszín"
-        />
-        <input
-          type="datetime-local"
-          name="datum"
-          value={newEvent.datum}
-          onChange={handleInputChange}
-        />
-        <textarea
-          name="leiras"
-          value={newEvent.leiras}
-          onChange={handleInputChange}
-          placeholder="Esemény leírása"
-        />
-        <button type="submit">Hozzáadás</button>
-      </form>
+      <Form onSubmit={handleAddEvent}>
+        <Row className="mb-3">
+          <Col xs={12} md={6}>
+            <Form.Control
+              type="text"
+              name="cime"
+              value={newEvent.cime}
+              onChange={handleInputChange}
+              placeholder="Esemény címe"
+              required
+            />
+          </Col>
+          <Col xs={12} md={6}>
+            <Form.Control
+              type="text"
+              name="helyszin"
+              value={newEvent.helyszin}
+              onChange={handleInputChange}
+              placeholder="Helyszín"
+              required
+            />
+          </Col>
+        </Row>
+        <Row className="mb-3">
+          <Col xs={12} md={6}>
+            <Form.Control
+              type="datetime-local"
+              name="datum"
+              value={newEvent.datum}
+              onChange={handleInputChange}
+              required
+            />
+          </Col>
+          <Col xs={12}>
+            <Form.Control
+              as="textarea"
+              name="leiras"
+              value={newEvent.leiras}
+              onChange={handleInputChange}
+              placeholder="Esemény leírása"
+              rows={3}
+              required
+            />
+          </Col>
+        </Row>
+        <Button type="submit" variant="success">
+          Hozzáadás
+        </Button>
+      </Form>
 
       {/* Edit event */}
       {editEvent && (
-        <div>
+        <div className="mt-5">
           <h2>Esemény szerkesztése</h2>
-          <form onSubmit={handleUpdateEvent}>
-            <input
-              type="text"
-              name="cime"
-              value={editEvent.cime}
-              onChange={(e) => setEditEvent({ ...editEvent, cime: e.target.value })}
-              placeholder="Esemény címe"
-            />
-            <input
-              type="text"
-              name="helyszin"
-              value={editEvent.helyszin}
-              onChange={(e) => setEditEvent({ ...editEvent, helyszin: e.target.value })}
-              placeholder="Helyszín"
-            />
-            <input
-              type="datetime-local"
-              name="datum"
-              value={editEvent.datum}
-              onChange={(e) => setEditEvent({ ...editEvent, datum: e.target.value })}
-            />
-            <textarea
-              name="leiras"
-              value={editEvent.leiras}
-              onChange={(e) => setEditEvent({ ...editEvent, leiras: e.target.value })}
-              placeholder="Esemény leírása"
-            />
-            <button type="submit">Frissítés</button>
-          </form>
+          <Form onSubmit={handleUpdateEvent}>
+            <Row className="mb-3">
+              <Col xs={12} md={6}>
+                <Form.Control
+                  type="text"
+                  name="cime"
+                  value={editEvent.cime}
+                  onChange={(e) => setEditEvent({ ...editEvent, cime: e.target.value })}
+                  placeholder="Esemény címe"
+                  required
+                />
+              </Col>
+              <Col xs={12} md={6}>
+                <Form.Control
+                  type="text"
+                  name="helyszin"
+                  value={editEvent.helyszin}
+                  onChange={(e) => setEditEvent({ ...editEvent, helyszin: e.target.value })}
+                  placeholder="Helyszín"
+                  required
+                />
+              </Col>
+            </Row>
+            <Row className="mb-3">
+              <Col xs={12} md={6}>
+                <Form.Control
+                  type="datetime-local"
+                  name="datum"
+                  value={editEvent.datum}
+                  onChange={(e) => setEditEvent({ ...editEvent, datum: e.target.value })}
+                  required
+                />
+              </Col>
+              <Col xs={12}>
+                <Form.Control
+                  as="textarea"
+                  name="leiras"
+                  value={editEvent.leiras}
+                  onChange={(e) => setEditEvent({ ...editEvent, leiras: e.target.value })}
+                  placeholder="Esemény leírása"
+                  rows={3}
+                  required
+                />
+              </Col>
+            </Row>
+            <Button type="submit" variant="primary">
+              Frissítés
+            </Button>
+          </Form>
         </div>
       )}
-    </div>
+    </Container>
   );
 };
+
 export default Esemenyek;

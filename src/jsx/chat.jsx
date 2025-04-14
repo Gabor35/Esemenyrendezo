@@ -51,7 +51,7 @@ const Chat = () => {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
         >
-          💬 Chat Fórum
+        Chat
         </motion.h1>
 
         <div
