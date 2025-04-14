@@ -72,6 +72,7 @@ const EventList = ({ isGridView = false }) => {
         await axios.delete(`${apiUrl}Reszvetel/${token}/${eventId}`);
       } else {
         await axios.post(`${apiUrl}Reszvetel/${token}/${eventId}`);
+        console.log(eventId)
       }
       setFilledHearts(prev => ({ ...prev, [eventId]: !prev[eventId] }));
     } catch (error) {
