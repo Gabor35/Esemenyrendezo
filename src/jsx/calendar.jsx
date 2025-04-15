@@ -1,16 +1,53 @@
 import React, { useState, useEffect } from 'react';
 import moment from 'moment';
 import { motion } from 'framer-motion';
+import { collection, getDocs, query, where, getDoc, doc } from 'firebase/firestore';
+import { db } from './firebase2';
 import '../calendar.css';
 
 export const Calendar = () => {
   const [currentDate, setCurrentDate] = useState(moment());
-  const [selectedDate, setSelectedDate] = useState(null);
   const [events, setEvents] = useState([]);
+  const [selectedDate, setSelectedDate] = useState(null);
 
+  // Fetch saved events from Firebase instead of localStorage
   useEffect(() => {
-    const storedEvents = JSON.parse(localStorage.getItem('events')) || [];
-    setEvents(storedEvents);
+    const fetchSavedEvents = async () => {
+      const storedUser = JSON.parse(localStorage.getItem('felhasz'));
+      if (!storedUser) return;
+
+      try {
+        // Query the "saveEvents" collection for events saved by the current user
+        const savesQuery = query(
+          collection(db, "saveEvents"),
+          where("userId", "==", storedUser.name)
+        );
+        const savesSnapshot = await getDocs(savesQuery);
+
+        if (savesSnapshot.empty) {
+          setEvents([]);
+          return;
+        }
+
+        // Retrieve event details for each saved event
+        const eventPromises = savesSnapshot.docs.map(async (docSnap) => {
+          const eventId = docSnap.data().eventId;
+          const eventDoc = await getDoc(doc(db, "events", String(eventId)));
+          if (eventDoc.exists()) {
+            return { id: eventDoc.id, ...eventDoc.data() };
+          }
+          return null;
+        });
+
+        const eventsData = await Promise.all(eventPromises);
+        const validEvents = eventsData.filter(event => event !== null);
+        setEvents(validEvents);
+      } catch (err) {
+        console.error("Error fetching firebase saved events:", err);
+      }
+    };
+
+    fetchSavedEvents();
   }, []);
 
   const renderHeader = () => (
@@ -65,15 +102,23 @@ export const Calendar = () => {
     let day = startDate;
 
     while (day <= endDate) {
+      // Build one week of cells
       for (let i = 0; i < 7; i++) {
         const cloneDay = moment(day);
-        const eventsForDay = events.filter(event => 
-          moment(event.Datum).format('YYYY-MM-DD') === cloneDay.format('YYYY-MM-DD')
-        );
-
+        // Convert Firebase timestamps if needed for correct date comparison
+        const eventsForDay = events.filter(event => {
+          let eventDate = event.Datum;
+          if (eventDate && eventDate.seconds) {
+            eventDate = moment(eventDate.seconds * 1000);
+          } else {
+            eventDate = moment(eventDate);
+          }
+          return eventDate.format('YYYY-MM-DD') === cloneDay.format('YYYY-MM-DD');
+        });
+        
         days.push(
           <motion.div
-            key={day}
+            key={cloneDay.format('YYYY-MM-DD')}
             className={`calendar-cell ${
               !cloneDay.isSame(currentDate, 'month') ? 'disabled' : ''
             } ${cloneDay.isSame(moment(), 'day') ? 'today' : ''}`}
@@ -92,7 +137,7 @@ export const Calendar = () => {
       }
       rows.push(
         <motion.div 
-          key={day} 
+          key={day.format('YYYY-MM-DD')}
           className="calendar-row"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
@@ -116,27 +161,8 @@ export const Calendar = () => {
       {renderHeader()}
       {renderDays()}
       <div className="calendar-body">{renderCells()}</div>
-      {selectedDate && (
-        <motion.div 
-          className="selected-date-events"
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.3 }}
-        >
-          <h3>{selectedDate.format('YYYY. MMMM D.')}</h3>
-          {events
-            .filter(event => 
-              moment(event.Datum).format('YYYY-MM-DD') === selectedDate.format('YYYY-MM-DD')
-            )
-            .map(event => (
-              <div key={event.EsemenyID} className="event-item">
-                <h4>{event.Cime}</h4>
-                <p>{event.Helyszin}</p>
-                <p>{moment(event.Datum).format('HH:mm')}</p>
-              </div>
-            ))}
-        </motion.div>
-      )}
+      {/* Removed the separate selected-date events details block 
+          to only mark saved events on the calendar */}
     </motion.div>
   );
 };
