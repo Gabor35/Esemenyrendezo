@@ -1,3 +1,4 @@
+// EventList.jsx
 import React, { useState, useEffect } from 'react';
 import {
   collection,
@@ -17,7 +18,6 @@ import heartFillIcon from '../pictures/heart-fill.svg';
 import { useGlobalContext } from '../Context/GlobalContext';
 
 const EventList = ({ events: initialEvents = [], isGridView = false }) => {
-  // Create state to manage events locally
   const [events, setEvents] = useState(initialEvents);
   const [selectedEvent, setSelectedEvent] = useState(null);
   const [showModal, setShowModal] = useState(false);
@@ -29,31 +29,32 @@ const EventList = ({ events: initialEvents = [], isGridView = false }) => {
   // Get user data from localStorage
   const userData = JSON.parse(localStorage.getItem('felhasz'));
 
-  // Use the events passed from props or fetch them if not provided
+  // On mount, if no events passed down, fetch from Firestore
   useEffect(() => {
-    if (events.length > 0) {
-      setLoading(false);
-    } else {
-      const fetchEvents = async () => {
-        try {
-          const q = query(collection(db, 'events'), orderBy('Datum', 'desc'));
-          const querySnapshot = await getDocs(q);
-          const eventsData = querySnapshot.docs.map(docSnap => ({
-            id: docSnap.id,
-            ...docSnap.data()
-          }));
-          setEvents(eventsData);  // Now safe to call setEvents
-          setLoading(false);
-        } catch (e) {
-          console.error("Hiba történt az események lekérésekor: ", e);
-          setError('Hiba történt az események betöltése során');
-          setLoading(false);
-        }
-      };
+    const fetchEvents = async () => {
+      try {
+        const q = query(collection(db, 'events'), orderBy('Datum', 'desc'));
+        const querySnapshot = await getDocs(q);
+        const eventsData = querySnapshot.docs.map((docSnap) => ({
+          id: docSnap.id,
+          ...docSnap.data(),
+        }));
+        setEvents(eventsData);
+        setLoading(false);
+      } catch (e) {
+        console.error('Hiba történt az események lekérésekor: ', e);
+        setError('Hiba történt az események betöltése során');
+        setLoading(false);
+      }
+    };
 
+    if (!initialEvents.length) {
       fetchEvents();
+    } else {
+      // Already have initialEvents
+      setLoading(false);
     }
-  }, [events]);
+  }, [initialEvents]);
 
   // Check saved events for the current user from Firestore "saveEvents" collection
   useEffect(() => {
@@ -69,7 +70,7 @@ const EventList = ({ events: initialEvents = [], isGridView = false }) => {
 
         // Build a map of eventId -> true for quick lookup
         const savedHeartsData = {};
-        querySnapshot.forEach(docSnap => {
+        querySnapshot.forEach((docSnap) => {
           const { eventId } = docSnap.data();
           savedHeartsData[eventId] = true;
         });
@@ -95,15 +96,15 @@ const EventList = ({ events: initialEvents = [], isGridView = false }) => {
     try {
       if (filledHearts[eventId]) {
         // Unsave: delete from Firestore
-        await deleteDoc(doc(db, "saveEvents", compositeId));
+        await deleteDoc(doc(db, 'saveEvents', compositeId));
       } else {
         // Save only userId & eventId
-        await setDoc(doc(db, "saveEvents", compositeId), {
+        await setDoc(doc(db, 'saveEvents', compositeId), {
           userId,
-          eventId
+          eventId,
         });
       }
-      setFilledHearts(prev => ({ ...prev, [eventId]: !prev[eventId] }));
+      setFilledHearts((prev) => ({ ...prev, [eventId]: !prev[eventId] }));
     } catch (error) {
       alert('Hiba: ' + error.message);
     }
@@ -121,19 +122,19 @@ const EventList = ({ events: initialEvents = [], isGridView = false }) => {
     <div className="container mt-4">
       <AnimatePresence>
         <motion.div
-          key={isGridView ? "grid" : "list"}
+          key={isGridView ? 'grid' : 'list'}
           initial={{ opacity: 0, scale: 0.95 }}
           animate={{ opacity: 1, scale: 1 }}
           exit={{ opacity: 0, scale: 0.95 }}
           transition={{ duration: 0.3 }}
-          className={isGridView ? "row" : "list-group"}
+          className={isGridView ? 'row' : 'list-group'}
         >
           {events.map((event, index) => (
             <motion.div
               className={
                 isGridView
-                  ? "col-md-4 mb-4"
-                  : "list-group-item d-flex align-items-center mb-3 p-3 border rounded shadow-sm"
+                  ? 'col-md-4 mb-4'
+                  : 'list-group-item d-flex align-items-center mb-3 p-3 border rounded shadow-sm'
               }
               key={event.id}
               initial={{ opacity: 0, y: 50 }}
@@ -143,17 +144,24 @@ const EventList = ({ events: initialEvents = [], isGridView = false }) => {
             >
               <div
                 className="card mb-3"
-                style={isGridView ? {} : { display: 'flex', flexDirection: 'row', width: '100%' }}
+                style={
+                  isGridView ? {} : { display: 'flex', flexDirection: 'row', width: '100%' }
+                }
               >
                 {event.Kepurl && (
                   <img
                     src={event.Kepurl}
-                    className={isGridView ? "card-img-top" : "img-thumbnail"}
+                    className={isGridView ? 'card-img-top' : 'img-thumbnail'}
                     alt={event.Cime}
                     style={
                       isGridView
                         ? { height: '200px', objectFit: 'cover' }
-                        : { maxWidth: '200px', maxHeight: '200px', objectFit: 'cover', marginRight: '15px' }
+                        : {
+                            maxWidth: '200px',
+                            maxHeight: '200px',
+                            objectFit: 'cover',
+                            marginRight: '15px',
+                          }
                     }
                   />
                 )}
@@ -162,7 +170,9 @@ const EventList = ({ events: initialEvents = [], isGridView = false }) => {
                   <p className="card-text">
                     Dátum:{' '}
                     {new Date(
-                      event.Datum?.seconds ? event.Datum.seconds * 1000 : event.Datum
+                      event.Datum?.seconds
+                        ? event.Datum.seconds * 1000
+                        : event.Datum
                     ).toLocaleString()}
                   </p>
                   <p className="card-text">Helyszín: {event.Helyszin}</p>
@@ -180,7 +190,7 @@ const EventList = ({ events: initialEvents = [], isGridView = false }) => {
                       border: 'none',
                       cursor: 'pointer',
                       padding: '5px',
-                      marginLeft: '10px'
+                      marginLeft: '10px',
                     }}
                     onClick={(e) => handleHeartClick(event.id, e)}
                   >

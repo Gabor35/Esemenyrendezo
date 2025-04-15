@@ -1,30 +1,45 @@
+// App.jsx
 import { GlobalProvider } from "../Context/GlobalContext";
 import React, { useState, useEffect } from "react";
-import { BrowserRouter as Router, Routes, Route, NavLink, useLocation } from "react-router-dom";
+import {
+  BrowserRouter as Router,
+  Routes,
+  Route,
+  NavLink,
+  useLocation,
+} from "react-router-dom";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "bootstrap/dist/js/bootstrap.bundle.min";
 import { motion } from "framer-motion";
 import { Login } from "../UsersLogin/Login";
 import { Register } from "../UsersLogin/Register";
 import AddEvent from "./AddEvent";
-import EventList  from "./EventList";
+import EventList from "./EventList";
 import logo from "../pictures/logo.jpg";
 import hatterGif from "../pictures/background.jpg";
 import Chat from "./chat";
 import { Calendar } from "./calendar";
-import  Saved  from "./saved";
+import Saved from "./saved";
 import axios from "axios";
 import Aboutus from "./aboutus";
 import gear from "../pictures/gear-fill.svg";
 import gridIcon from "../pictures/grid.svg";
 import listIcon from "../pictures/card-list.svg";
-import { collection, getDocs, query, orderBy } from 'firebase/firestore';
-import { db } from './firebase2';
+
+// Firestore imports
+import {
+  collection,
+  getDocs,
+  query,
+  orderBy,
+  where,
+} from "firebase/firestore";
+import { db } from "./firebase2";
 
 const setupAxiosDefaults = () => {
-  const userData = JSON.parse(localStorage.getItem('felhasz'));
+  const userData = JSON.parse(localStorage.getItem("felhasz"));
   if (userData?.token) {
-    axios.defaults.headers.common['Authorization'] = `Bearer ${userData.token}`;
+    axios.defaults.headers.common["Authorization"] = `Bearer ${userData.token}`;
   }
 };
 
@@ -32,10 +47,13 @@ const AppContent = () => {
   const [events, setEvents] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [user, setUser] = useState(null);
+
+  // Filter states
   const [filterDate, setFilterDate] = useState("");
   const [filterTime, setFilterTime] = useState("");
   const [filterLocation, setFilterLocation] = useState("");
   const [filterName, setFilterName] = useState("");
+
   const location = useLocation();
   const [showLogout, setShowLogout] = useState(false);
   const [showDropdown, setShowDropdown] = useState(false);
@@ -49,35 +67,123 @@ const AppContent = () => {
     if (storedUser) {
       setUser(storedUser);
     }
-   
-    // Fetch events from Firestore instead of API
-    const fetchEvents = async () => {
-      try {
-        const q = query(collection(db, 'events'), orderBy('Datum', 'desc'));
-        const querySnapshot = await getDocs(q);
-        const eventsData = querySnapshot.docs.map(docSnap => ({
-          id: docSnap.id,
-          ...docSnap.data()
-        }));
-        setEvents(eventsData);
-        setLoading(false);
-      } catch (error) {
-        console.error("Error fetching events:", error);
-        setLoading(false);
-      }
-    };
-   
-    fetchEvents();
+
+    // Whenever the App mounts (or a filter changes, if you prefer),
+    // we fetch from Firestore:
+    fetchEventsFromFirestore();
     setupAxiosDefaults();
   }, []);
 
+  // ------------------------------------------------------------------
+  // APPROACH A: Firestore-based filtering for EXACT or range matches
+  // Comment/uncomment as needed
+
+  const fetchEventsFromFirestore = async () => {
+    try {
+      let qRef = query(collection(db, "events"), orderBy("Datum", "desc"));
+
+      // If you only want to do an EXACT date match (no partial):
+      // If the user selected 2025-04-15 as filterDate, we can do a range from:
+      // 2025-04-15 00:00:00 to 2025-04-15 23:59:59
+      if (filterDate) {
+        const startDate = new Date(filterDate);
+        startDate.setHours(0, 0, 0, 0);
+        const endDate = new Date(filterDate);
+        endDate.setHours(23, 59, 59, 999);
+        qRef = query(
+          qRef,
+          where("Datum", ">=", startDate),
+          where("Datum", "<=", endDate)
+        );
+      }
+
+      // For time-based filtering or partial matches on location/name,
+      // Firestore has no direct "contains" or "like".
+      // So you might do either:
+      //   1) exact match: where('Helyszin', '==', filterLocation)
+      //   2) client-side partial filtering (see approach B below).
+
+      // Example of an EXACT match for location:
+      if (filterLocation) {
+        qRef = query(qRef, where("Helyszin", "==", filterLocation));
+      }
+
+      // Example of an EXACT match for name (Cime):
+      if (filterName) {
+        qRef = query(qRef, where("Cime", "==", filterName));
+      }
+
+      // getDocs from Firestore
+      const querySnapshot = await getDocs(qRef);
+      const eventsData = querySnapshot.docs.map((docSnap) => ({
+        id: docSnap.id,
+        ...docSnap.data(),
+      }));
+
+      // If you want partial matching by time-of-day or substring,
+      // you can do that in Approach B client-side.
+      setEvents(eventsData);
+      setLoading(false);
+    } catch (error) {
+      console.error("Error fetching events:", error);
+      setLoading(false);
+    }
+  };
+
+  // ------------------------------------------------------------------
+  // APPROACH B: Client-side filtering for partial strings
+  // (You can combine with A by first fetching from Firestore with broad filters,
+  // then narrowing further on the client)
+
+  const getFilteredEventsClientSide = () => {
+    return events.filter((event) => {
+      // If you have Firestore Timestamp, convert to JS date
+      const eventDate = event.Datum?.seconds
+        ? new Date(event.Datum.seconds * 1000)
+        : new Date(event.Datum);
+
+      // 1. Date filtering (if we didn't already do it in fetchEventsFromFirestore)
+      const isDateMatch = filterDate
+        ? eventDate.toLocaleDateString() ===
+          new Date(filterDate).toLocaleDateString()
+        : true;
+
+      // 2. Time filtering (partial match for hours:minutes?)
+      // e.g. "14:30" must appear in the eventDate toLocaleTimeString
+      const isTimeMatch = filterTime
+        ? eventDate.toLocaleTimeString().includes(filterTime)
+        : true;
+
+      // 3. Location partial match (Firestore has no LIKE operator, so do it here)
+      const isLocationMatch = filterLocation
+        ? event.Helyszin?.toLowerCase().includes(filterLocation.toLowerCase())
+        : true;
+
+      // 4. Name partial match
+      const isNameMatch = filterName
+        ? event.Cime?.toLowerCase().includes(filterName.toLowerCase())
+        : true;
+
+      return isDateMatch && isTimeMatch && isLocationMatch && isNameMatch;
+    });
+  };
+
+  // In your EventList, we'll pass the final "filtered events" array:
+  const displayedEvents = getFilteredEventsClientSide();
+
+  // ------------------------------------------------------------------
+  // Add new event locally (from your AddEvent component)
   const handleAddEvent = (newEvent) => {
     setEvents((prevEvents) => {
       const updatedEvents = [...prevEvents, newEvent];
-      // Sort events by date (for Firestore timestamp objects)
+      // Sort events by date
       updatedEvents.sort((a, b) => {
-        const dateA = a.Datum?.seconds ? new Date(a.Datum.seconds * 1000) : new Date(a.Datum);
-        const dateB = b.Datum?.seconds ? new Date(b.Datum.seconds * 1000) : new Date(b.Datum);
+        const dateA = a.Datum?.seconds
+          ? new Date(a.Datum.seconds * 1000)
+          : new Date(a.Datum);
+        const dateB = b.Datum?.seconds
+          ? new Date(b.Datum.seconds * 1000)
+          : new Date(b.Datum);
         return dateA - dateB;
       });
       return updatedEvents;
@@ -85,36 +191,8 @@ const AppContent = () => {
     setIsModalOpen(false);
   };
 
-  // Updated filtering logic for Firestore data structure
-  const filteredEvents = events.filter((event) => {
-    // Handle Firestore timestamp objects
-    const eventDate = event.Datum?.seconds
-      ? new Date(event.Datum.seconds * 1000)
-      : new Date(event.Datum);
-   
-    // Date filtering
-    const isDateMatch = filterDate
-      ? eventDate.toLocaleDateString() === new Date(filterDate).toLocaleDateString()
-      : true;
-
-    // Time filtering
-    const isTimeMatch = filterTime
-      ? eventDate.toLocaleTimeString().includes(filterTime)
-      : true;
-
-    // Location filtering - using Helyszin instead of helyszin (case sensitive in Firestore)
-    const isLocationMatch = filterLocation
-      ? event.Helyszin?.toLowerCase().includes(filterLocation.toLowerCase())
-      : true;
-
-    // Name filtering - using Cime instead of cime (case sensitive in Firestore)
-    const isNameMatch = filterName
-      ? event.Cime?.toLowerCase().includes(filterName.toLowerCase())
-      : true;
-
-    return isDateMatch && isTimeMatch && isLocationMatch && isNameMatch;
-  });
-
+  // ------------------------------------------------------------------
+  // Render
   return (
     <div
       style={{
@@ -151,10 +229,7 @@ const AppContent = () => {
               {user && (
                 <>
                   <li className="nav-item">
-                    <motion.div
-                      whileHover={{ scale: 1.1 }}
-                      whileTap={{ scale: 0.9 }}
-                    >
+                    <motion.div whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }}>
                       <NavLink
                         to="/events"
                         style={{
@@ -255,7 +330,7 @@ const AppContent = () => {
               )}
             </ul>
             <ul className="navbar-nav ms-auto">
-              {!user ? ( // If user is not logged in
+              {!user ? (
                 <>
                   <li className="nav-item">
                     <NavLink
@@ -324,25 +399,24 @@ const AppContent = () => {
 
       <div className="container mt-4">
         {/* Only show filter controls when on the events page */}
-
         {isEventListPage && (
           <div className="row mb-4">
             <div className="col-12">
               <div className="p-3 bg-light rounded shadow-sm">
                 <div className="d-flex flex-row align-items-center gap-3">
-                  {/* List/Grid View Button moved to front */}
+                  {/* Toggle List/Grid View Button */}
                   <motion.button
                     className="btn"
                     onClick={() => setIsGridView(!isGridView)}
                     whileHover={{ scale: 1.1 }}
                     whileTap={{ scale: 0.9 }}
                     transition={{ duration: 0.2 }}
-                    style={{ width: '40px', height: '40px', padding: '8px', flexShrink: 0 }}
+                    style={{ width: "40px", height: "40px", padding: "8px", flexShrink: 0 }}
                   >
                     <img
                       src={isGridView ? listIcon : gridIcon}
                       alt={isGridView ? "List View" : "Grid View"}
-                      style={{ width: '100%', height: '100%' }}
+                      style={{ width: "100%", height: "100%" }}
                     />
                   </motion.button>
 
@@ -383,6 +457,18 @@ const AppContent = () => {
                     />
                   </div>
 
+                  {/* Apply Filter Button (if you want to do server-side again) */}
+                  <motion.button
+                    className="btn btn-primary"
+                    onClick={fetchEventsFromFirestore}
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                    transition={{ duration: 0.2 }}
+                    style={{ flexShrink: 0 }}
+                  >
+                    Szűrés (Firestore)
+                  </motion.button>
+
                   {/* Clear Filters Button */}
                   <motion.button
                     className="btn btn-secondary"
@@ -391,6 +477,8 @@ const AppContent = () => {
                       setFilterTime("");
                       setFilterLocation("");
                       setFilterName("");
+                      // Optionally re-fetch full list
+                      fetchEventsFromFirestore();
                     }}
                     whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.95 }}
@@ -408,7 +496,13 @@ const AppContent = () => {
         <Routes>
           <Route
             path="/events"
-            element={<EventList events={filteredEvents} isGridView={isGridView} />}
+            element={
+              loading ? (
+                <div>Betöltés...</div>
+              ) : (
+                <EventList events={isEventListPage ? displayedEvents : []} isGridView={isGridView} />
+              )
+            }
           />
           <Route path="/" element={<Login />} />
           <Route path="/login" element={<Login />} />
