@@ -13,7 +13,7 @@ import logo from "../pictures/logo.jpg";
 import hatterGif from "../pictures/background.jpg";
 import Chat from "./chat";
 import { Calendar } from "./calendar";
-import { Saved } from "./saved";
+import  Saved  from "./saved";
 import Esemenyek from "./Esemenyek";
 import axios from "axios";
 import Aboutus from "./aboutus";

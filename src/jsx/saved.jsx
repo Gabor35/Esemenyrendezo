@@ -14,7 +14,7 @@ import { db } from './firebase2';
 import heartFillIcon from '../pictures/heart-fill.svg';
 import { useGlobalContext } from '../Context/GlobalContext';
 
-export const Saved = () => {
+const Saved = () => {
   const [savedEvents, setSavedEvents] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -25,11 +25,12 @@ export const Saved = () => {
   // Get user data from localStorage
   const userData = JSON.parse(localStorage.getItem('felhasz'));
 
-  // Fetch saved event IDs from "saveEvents" for this user,
-  // then fetch the actual event details from "events".
+  // Fetch saved event IDs from "saveEvents" and then retrieve event details from "events"
   useEffect(() => {
     const fetchSavedEvents = async () => {
       setLoading(true);
+      setError(null);
+
       if (!userData) {
         setError('Be kell jelentkezned a mentett események megtekintéséhez');
         setLoading(false);
@@ -37,33 +38,30 @@ export const Saved = () => {
       }
 
       try {
-        const q = query(
+        const savesQuery = query(
           collection(db, "saveEvents"),
           where("userId", "==", userData.name)
         );
-        const querySnapshot = await getDocs(q);
+        const savesSnapshot = await getDocs(savesQuery);
 
-        const fetchedEvents = [];
-
-        // For each saveEvents doc, retrieve the event data from "events"
-        for (const docSnap of querySnapshot.docs) {
+        // Use Promise.all to fetch all event details concurrently.
+        const eventPromises = savesSnapshot.docs.map(async (docSnap) => {
           const { eventId } = docSnap.data();
           const eventRef = doc(db, "events", eventId);
           const eventSnap = await getDoc(eventRef);
-
           if (eventSnap.exists()) {
-            // Merge event data with eventId for display
-            fetchedEvents.push({
-              eventId,
-              // or docSnap.data().userId if needed
-              ...eventSnap.data()
-            });
+            return { eventId, ...eventSnap.data() };
+          } else {
+            return null;
           }
-        }
+        });
 
-        setSavedEvents(fetchedEvents);
-        setError(null);
+        const eventsData = await Promise.all(eventPromises);
+        // Filter out any null results in case an event does not exist
+        const filteredEvents = eventsData.filter((event) => event !== null);
+        setSavedEvents(filteredEvents);
       } catch (err) {
+        console.error("Error fetching saved events: ", err);
         setError("Nem sikerült lekérni a mentett eseményeket: " + err.message);
         setSavedEvents([]);
       } finally {
@@ -74,13 +72,13 @@ export const Saved = () => {
     fetchSavedEvents();
   }, [userData]);
 
-  // Handle showing event details
+  // Show modal with event details
   const handleShowDetails = (event) => {
     setSelectedEvent(event);
     setShowModal(true);
   };
 
-  // Remove the saved event by deleting the doc from "saveEvents"
+  // Remove the saved event by deleting from "saveEvents" collection
   const handleUnsaveEvent = async (eventId, e) => {
     e.preventDefault();
     if (!userData) {
@@ -90,8 +88,11 @@ export const Saved = () => {
     const compositeId = `${userData.name}_${eventId}`;
     try {
       await deleteDoc(doc(db, "saveEvents", compositeId));
-      setSavedEvents(prev => prev.filter(event => event.eventId !== eventId));
+      setSavedEvents((prev) =>
+        prev.filter((event) => event.eventId !== eventId)
+      );
     } catch (err) {
+      console.error("Error unsaving event: ", err);
       setError('Nem sikerült eltávolítani az eseményt: ' + err.message);
     }
   };
@@ -138,7 +139,7 @@ export const Saved = () => {
               <div className="card-body">
                 <h5 className="card-title">{event.Cime}</h5>
                 <p className="card-text">
-                  Dátum:{' '}
+                  Dátum:{" "}
                   {new Date(
                     event.Datum?.seconds ? event.Datum.seconds * 1000 : event.Datum
                   ).toLocaleString()}
@@ -190,7 +191,7 @@ export const Saved = () => {
             />
           )}
           <p>
-            <strong>Dátum:</strong>{' '}
+            <strong>Dátum:</strong>{" "}
             {new Date(
               selectedEvent?.Datum?.seconds
                 ? selectedEvent.Datum.seconds * 1000
