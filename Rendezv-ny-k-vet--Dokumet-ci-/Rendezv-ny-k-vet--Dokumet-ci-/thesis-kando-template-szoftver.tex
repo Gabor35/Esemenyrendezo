@@ -170,7 +170,7 @@ A JSX kódot a React a háttérben JavaScript objektumokká fordítja, amiket az
 A React egy virtuális DOM-ot használ a weboldalak renderelésének optimalizálására. Amikor a komponens állapota vagy a props változik, a React először a virtuális DOM-ban végzi el az összes változást, majd összehasonlítja azt a valódi DOM-mal. Csak azokat az elemeket frissíti, amelyek ténylegesen változtak, ezáltal gyorsabbá és hatékonyabbá téve az alkalmazás működését.
 
 2. Állapot és Props
-2.1 Állapotkezelés (State)
+\label{2.1} Állapotkezelés (State)
 A state a React-ben egy komponens saját adatainak tárolására szolgál. Az állapot lehetővé teszi, hogy a komponens dinamikusan reagáljon a felhasználói interakciókra, például gombnyomásra, adatbevitelre, vagy bármely más eseményre. Az állapot kezelése a useState hook segítségével történik funkcionális komponensek esetén.
 
 Példa egy egyszerű számláló alkalmazásra, amely az állapot kezelését mutatja be:
@@ -554,60 +554,50 @@ Ez a kombináció a modern webfejlesztés alapja, és nagyban javítja a fejlesz
 \chapter{Program}
 
 \section{Adatbázis}
-Ez az SQL szkript három különböző táblát tartalmaz, amelyeket egy eseményrendező rendszerhez terveztünk. A három tábla az alábbiak szerint van kialakítva:
+Ez a SQL szkript három különböző táblát tartalmaz, amelyeket egy eseményrendező rendszerhez terveztünk. A három tábla az alábbiak szerint van kialakítva:
 
-\subsection{Felhasználó}
-Ez a tábla a felhasználók adatait tartalmazza, beleértve a felhasználó nevét, teljes nevét, email címét, jogosultságait, aktivitási státuszát, valamint a regisztráció időpontját és egyéb kapcsolódó adatokat. A tábla segítségével nyomon követhetjük a felhasználói fiókokat és jogosultságokat, biztosítva a megfelelő hozzáférést a rendszer különböző funkcióihoz.
+\begin{enumerate}
+	\item felhasznalo: Ez a tábla a felhasználók adatait tartalmazza, beleértve a felhasználó nevét, teljes nevét, email címét, jogosultságait, aktivitási státuszát, valamint a regisztráció időpontját és egyéb kapcsolódó adatokat. A tábla segítségével nyomon követhetjük a felhasználói fiókokat és jogosultságokat, biztosítva a megfelelő hozzáférést a rendszer különböző funkcióihoz.
+	\item esemeny: Az eseménytáblában különböző rendezvények információit tároljuk, beleértve az esemény nevét, helyszínét, dátumát, leírását és a kapcsolódó képet. Ez a tábla lehetővé teszi a különböző események könnyű kezelését és megjelenítését a rendszerben.
+	\item chat messages: Ez a tábla a felhasználók közötti üzenetváltásokat tárolja, amelyben szerepel az üzenet ID-ja, a felhasználó neve, az üzenet szövege és az üzenet küldésének időpontja. A tábla használata lehetővé teszi a chat üzenetek rögzítését és későbbi visszakeresését.
+\end{enumerate}
 
-\subsection{Esemény}
-Az eseménytáblában különböző rendezvények információit tároljuk, beleértve az esemény nevét, helyszínét, dátumát, leírását és a kapcsolódó képet. Ez a tábla lehetővé teszi a különböző események könnyű kezelését és megjelenítését a rendszerben.
+\noindent A rendszer ezen táblák segítségével hatékonyan képes kezelni a felhasználók közötti kommunikációt, az események szervezését és a felhasználói adatokat. Az adatbázis felépítése biztosítja a rugalmas és átlátható működést, lehetővé téve a könnyű adatkezelést és a jövőbeli bővítéseket.
 
-\subsection{Chat üzenetek}
-Ez a tábla a felhasználók közötti üzenetváltásokat tárolja, amelyben szerepel az üzenet ID-ja, a felhasználó neve, az üzenet szövege és az üzenet küldésének időpontja. A tábla használata lehetővé teszi a chat üzenetek rögzítését és későbbi visszakeresését.
 
-\noindent 
-A rendszer ezen táblák segítségével hatékonyan képes kezelni a felhasználók közötti kommunikációt, az események szervezését és a felhasználói adatokat. Az adatbázis felépítése biztosítja a rugalmas és átlátható működést, lehetővé téve a könnyű adatkezelést és a jövőbeli bővítéseket.
 
- \section{Backend}
- 
- \section{Frontend}
- \noindent 
- \textit{A frontend a React könyvtárral készült, amely egy modern JavaScript alapú keretrendszer az interaktív felhasználói felületek létrehozására. A komponensalapú felépítés lehetővé teszi a kód újrafelhasználását és jól strukturált alkalmazás készítését.}
- 
- \subsection{Eseményrendező program bemutatása}
- A program célja események létrehozása, mentése és listázása egy könnyen kezelhető felületen keresztül. A felhasználók eseményeket adhatnak hozzá, amelyek különböző attribútumokkal rendelkeznek (pl. cím, leírás, dátum). Az események tárolása Firebase adatbázisban történik, megkönnyítve a valós idejű szinkronizációt több felhasználó között. A felhasználók bejelentkezés után hozzáférhetnek saját eseményeikhez, és menthetik vagy szerkeszthetik azokat.
- 
- \subsection{Login.jsx}
- Ez a komponens felelős a felhasználók bejelentkezéséért. A felhasználó e-mail és jelszó megadásával hitelesíti magát. A helyes adatok ellenőrzése után átirányítás történik a főoldalra, és a felhasználó adatai a kontextusba kerülnek.
- 
- \subsection{Register.jsx}
- Ez a komponens lehetőséget biztosít új felhasználók regisztrációjára. Az űrlapon megadott adatokat (pl. név, e-mail, jelszó) validálja, majd a backend segítségével új fiókot hoz létre. Sikeres regisztráció után kap a felhasználó egy megerősítő email levelet. Ha megtörténik a megerősítés, akkor utána a bejelentkezési felületen tudja megadni a bejelentkezési adatait.
- 
- \subsection{Chat.jsx}
- Ez a komponens biztosítja a felhasználók közötti üzenetküldést. A felhasználók valós időben írhatnak és fogadhatnak üzeneteket, amelyeket a rendszer egy adatbázisban tárol a Firebase-ban. Az üzenetek megjelenítése lista formában történik, a legújabb üzenetek kerülnek legalulra. Az üzenetküldő mezőben a felhasználó új üzenetet írhat, amely elküldés után automatikusan frissül a felületen.
- 
- \subsection{Aboutus.jsx}
- Ez a komponens egy statikus oldalt jelenít meg, amely bemutatja az alkalmazás céljainkat és a hátterünket.
- 
- 
+\section{Frontend}
+A framer-motion egy animációs könyvtár a React számára, amely egyszerű és hatékony módot biztosít elemek animálására. A fenti kódban a motion.div, motion.h1 és motion.button komponensek használatával az elemek megjelenése, átméretezése és interakciói animáltak.
+\begin{enumerate}
+	Mire alkalmas?
+	\item Belépési animációk: Az elemek simán jelennek meg (initial, animate propokkal).
+	\item Interaktív effektek: Pl. a gomb hover és kattintás effektek (whileHover, whileTap).
+	\item Folyamatos átmenetek: Például a chatüzenetek késleltetett megjelenése (delay a transition-ben).
+\end{enumerate}
+
 \chapter*{Összegzés}
 \addcontentsline{toc}{chapter}{Összegzés}
 
-A program célja, hogy egyszerűsíti az események szervezését és nyomon követését, miközben lehetőséget ad a felhasználóknak a saját eseményeik személyre szabott kezelésére. A regisztrációval és bejelentkezéssel rendelkező felhasználók biztonságosan kezelhetik profiljaikat, és könnyedén rögzíthetik, illetve menthetik eseményeiket pontos időpontokkal és dátumokkal. Az email-es regisztrációs validálás pedig biztosítja a rendszer integritását és a felhasználói adatok védelmét.
-
-Ez az alkalmazás nemcsak praktikus, hanem felhasználóbarát megoldást kínál azoknak, akik hatékonyan szeretnék menedzselni napi eseményeiket és találkozóikat. A rendszer rugalmasságot és egyszerű használhatóságot biztosít a felhasználók számára, miközben a személyes adatvédelemre is kiemelt figyelmet fordít.
+Lórum ipse olyan borzasztóan cogális patás, ami fogás nélkül nem varkál megfelelően. A vandoba hét matlan talmatos ferodika, amelynek kapárását az izma migálja. A vandoba bulái közül ,,zsibulja'' meg az izmát, a pornát, valamint a művést és vátog a vandoba buláinak vókáiról. Vókája a raktil prozása két emen között. Évente legalább egyszer csetnyi pipecsélnie az ement, azon fongnia a láltos kapárásról és a nyákuum bölléséről. A vandoba ninti és az emen elé redőzi a szamlan radalmakan érvést. Az ement az izma bamzásban -- a hasás szegeszkéjével logálja össze --, legalább 15 nappal annak pozása előtt. Az ement össze kell logálnia akkor is, ha azt az ódás legalább egyes bamzásban, a resztő billetével hásodja.
 
 
 
-
+\newpage
 \Huge\begin{center}
 	\textbf{Köszönetnyilvánítás}	
 \end{center}\normalsize
-Köszönöm mindazoknak, akik hozzájárultak vizsgaremekünk elkészítéséhez, különösen Kerényi Róbert Nándornak és Németh Bencének a szakmai segítséget és támogatást.
+Szeretnék köszönetet mondani mindazoknak, akik segítették a vizsgaremekem létrejöttét, külön megköszönve
 \newline\newline
+Lórum ipse olyan borzasztóan cogális patás, ami fogás nélkül nem varkál megfelelően. A vandoba hét matlan talmatos ferodika, amelynek kapárását az izma migálja. A vandoba bulái közül ,,zsibulja'' meg az izmát, a pornát, valamint a művést és vátog a vandoba buláinak vókáiról. Vókája a raktil prozása két emen között. Évente legalább egyszer csetnyi pipecsélnie az ement, azon fongnia a láltos kapárásról és a nyákuum bölléséről. A vandoba ninti és az emen elé redőzi a szamlan radalmakan érvést. Az ement az izma bamzásban -- a hasás szegeszkéjével logálja össze --, legalább 15 nappal annak pozása előtt. Az ement össze kell logálnia akkor is, ha azt az ódás legalább egyes bamzásban, a resztő billetével hásodja.
 
-
-
+\begin{figure}[ht!]
+	\centering
+	\begin{turn}{90}
+		\includegraphics[width=24cm]{figures/RNFa}
+	\end{turn}
+	\caption[1 melleklet]{1. Példa bizonyítási fája}
+	\label{fig-melleklet1}
+\end{figure}
 
 \begin{thebibliography}{2}
 \addcontentsline{toc}{chapter}{\bibname}
@@ -630,7 +620,7 @@ Köszönöm mindazoknak, akik hozzájárultak vizsgaremekünk elkészítéséhez
 %\includepdf{}
 \begin{figure}[bt]
 	\begin{center}
-		\includegraphics[width=1\textwidth]{tabla.png}
+		\includegraphics[width=1\textwidth]{es.png}
 	\end{center}
 	\end {figure}
 \end{document}

@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.25 (MiKTeX 24.1) (preloaded format=pdflatex 2025.3.13)  15 APR 2025 11:00
+This is pdfTeX, Version 3.141592653-2.6-1.40.25 (MiKTeX 24.1) (preloaded format=pdflatex 2025.3.13)  13 MAR 2025 11:18
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -1206,18 +1206,15 @@ File: epstopdf-sys.cfg 2021/03/18 v2.0 Configuration of epstopdf for MiKTeX
 LaTeX Info: Redefining \cal on input line 577.
 LaTeX Info: Redefining \mit on input line 578.
 )
-
-pdfTeX warning: pdflatex.exe (file ./kando-logo-hu.pdf): PDF inclusion: found P
-DF version <1.7>, but at most version <1.5> allowed
-<kando-logo-hu.pdf, id=102, 213.4374pt x 199.22429pt>
+<kando-logo-hu.pdf, id=66, 177.6738pt x 180.68504pt>
 File: kando-logo-hu.pdf Graphic file (type pdf)
 <use kando-logo-hu.pdf>
 Package pdftex.def Info: kando-logo-hu.pdf  used on input line 77.
-(pdftex.def)             Requested size: 213.43686pt x 199.2238pt.
+(pdftex.def)             Requested size: 177.67334pt x 180.6846pt.
 
 Class thesis-kando Warning: institute is missing on input line 77.
 
-<logo.jpg, id=103, 445.665pt x 449.68pt>
+<logo.jpg, id=67, 445.665pt x 449.68pt>
 File: logo.jpg Graphic file (type jpg)
 <use logo.jpg>
 Package pdftex.def Info: logo.jpg  used on input line 77.
@@ -1302,127 +1299,264 @@ tp://localhost:5000/api/products).
 2. fejezet.
 [18
 
-] [19] [20]
-Underfull \hbox (badness 10000) in paragraph at lines 606--608
+]
 
- []
+! LaTeX Error: Something's wrong--perhaps a missing \item.
+
+See the LaTeX manual or LaTeX Companion for explanation.
+Type  H <return>  for immediate help.
+ ...                                              
+                                                  
+l.573 	\item B
+              el√©p√©si anim√°ci√≥k: Az elemek sim√°n jelennek meg (initial,...
+
+Try typing  <return>  to proceed.
+If that doesn't work, type  X <return>  to quit.
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 606--608
+! LaTeX Error: Something's wrong--perhaps a missing \item.
 
- []
+See the LaTeX manual or LaTeX Companion for explanation.
+Type  H <return>  for immediate help.
+ ...                                              
+                                                  
+l.573 	\item B
+              el√©p√©si anim√°ci√≥k: Az elemek sim√°n jelennek meg (initial,...
 
-[21
+Try typing  <return>  to proceed.
+If that doesn't work, type  X <return>  to quit.
+
+
+! LaTeX Error: Something's wrong--perhaps a missing \item.
+
+See the LaTeX manual or LaTeX Companion for explanation.
+Type  H <return>  for immediate help.
+ ...                                              
+                                                  
+l.573 	\item B
+              el√©p√©si anim√°ci√≥k: Az elemek sim√°n jelennek meg (initial,...
+
+Try typing  <return>  to proceed.
+If that doesn't work, type  X <return>  to quit.
+
+
+! LaTeX Error: Something's wrong--perhaps a missing \item.
+
+See the LaTeX manual or LaTeX Companion for explanation.
+Type  H <return>  for immediate help.
+ ...                                              
+                                                  
+l.574 	\item I
+              nterakt√≠v effektek: Pl. a gomb hover √©s kattint√°s effektek ...
+
+Try typing  <return>  to proceed.
+If that doesn't work, type  X <return>  to quit.
+
+
+! LaTeX Error: Something's wrong--perhaps a missing \item.
+
+See the LaTeX manual or LaTeX Companion for explanation.
+Type  H <return>  for immediate help.
+ ...                                              
+                                                  
+l.574 	\item I
+              nterakt√≠v effektek: Pl. a gomb hover √©s kattint√°s effektek ...
+
+Try typing  <return>  to proceed.
+If that doesn't work, type  X <return>  to quit.
+
+
+! LaTeX Error: Something's wrong--perhaps a missing \item.
+
+See the LaTeX manual or LaTeX Companion for explanation.
+Type  H <return>  for immediate help.
+ ...                                              
+                                                  
+l.574 	\item I
+              nterakt√≠v effektek: Pl. a gomb hover √©s kattint√°s effektek ...
+
+Try typing  <return>  to proceed.
+If that doesn't work, type  X <return>  to quit.
+
+
+! LaTeX Error: Something's wrong--perhaps a missing \item.
+
+See the LaTeX manual or LaTeX Companion for explanation.
+Type  H <return>  for immediate help.
+ ...                                              
+                                                  
+l.575 	\item F
+              olyamatos √°tmenetek: P√©ld√°ul a chat√ºzenetek k√©sleltetett ...
+
+Try typing  <return>  to proceed.
+If that doesn't work, type  X <return>  to quit.
+
+
+! LaTeX Error: Something's wrong--perhaps a missing \item.
+
+See the LaTeX manual or LaTeX Companion for explanation.
+Type  H <return>  for immediate help.
+ ...                                              
+                                                  
+l.575 	\item F
+              olyamatos √°tmenetek: P√©ld√°ul a chat√ºzenetek k√©sleltetett ...
+
+Try typing  <return>  to proceed.
+If that doesn't work, type  X <return>  to quit.
+
+
+! LaTeX Error: Something's wrong--perhaps a missing \item.
+
+See the LaTeX manual or LaTeX Companion for explanation.
+Type  H <return>  for immediate help.
+ ...                                              
+                                                  
+l.575 	\item F
+              olyamatos √°tmenetek: P√©ld√°ul a chat√ºzenetek k√©sleltetett ...
+
+Try typing  <return>  to proceed.
+If that doesn't work, type  X <return>  to quit.
+
+
+! LaTeX Error: Something's wrong--perhaps a missing \item.
+
+See the LaTeX manual or LaTeX Companion for explanation.
+Type  H <return>  for immediate help.
+ ...                                              
+                                                  
+l.576 \end{enumerate}
+                     
+Try typing  <return>  to proceed.
+If that doesn't work, type  X <return>  to quit.
+
+[19] [20
 
 ]
-Underfull \hbox (badness 10000) in paragraph at lines 614--615
+Underfull \hbox (badness 10000) in paragraph at lines 589--592
+
+ []
+
+
+! LaTeX Error: File `figures/RNFa' not found.
+
+See the LaTeX manual or LaTeX Companion for explanation.
+Type  H <return>  for immediate help.
+ ...                                              
+                                                  
+l.596 		\includegraphics[width=24cm]{figures/RNFa}
+                                                  
+I could not locate the file with any of these extensions:
+.pdf,.png,.jpg,.mps,.jpeg,.jbig2,.jb2,.PDF,.PNG,.JPG,.JPEG,.JBIG2,.JB2,.eps
+Try typing  <return>  to proceed.
+If that doesn't work, type  X <return>  to quit.
+
+[21
+pdfTeX warning (ext4): destination with the same identifier (name{figure.2.1}) 
+has been already used, duplicate ignored
+<argument> ...shipout:D \box_use:N \l_shipout_box 
+                                                  \__shipout_drop_firstpage_...
+l.602 \begin{thebibliography}{2}
+                                ]
+Underfull \hbox (badness 10000) in paragraph at lines 604--605
 []\T1/lmr/m/sc/12 internetes for-r·s\T1/lmr/m/n/12 : \T1/lmr/m/it/12 Mi az a re
 -l·-ci-Ûs adat-b·-zis?\T1/lmr/m/n/12 , [][]$\T1/lmtt/m/n/12 https : / / azure .
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 614--615
+Underfull \hbox (badness 10000) in paragraph at lines 604--605
 \T1/lmtt/m/n/12 microsoft . com / hu-[]hu / resources / cloud-[]computing-[]dic
 tionary /
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 616--617
+Underfull \hbox (badness 10000) in paragraph at lines 606--607
 \T1/lmr/m/it/12 Co-re\T1/lmr/m/n/12 , [][]$\T1/lmtt/m/n/12 https : / / learn . 
 microsoft . com / en-[]us / aspnet / core / tutorials /
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 616--617
+Underfull \hbox (badness 10000) in paragraph at lines 606--607
 \T1/lmtt/m/n/12 first-[]web-[]api ? view = aspnetcore-[]9 . 0 & tabs = visual-[
 ]studio$[][]\T1/lmr/m/n/12 , Le-tˆlt-ve: 2025
  []
 
 
-Underfull \hbox (badness 4229) in paragraph at lines 618--619
+Underfull \hbox (badness 4229) in paragraph at lines 608--609
 []\T1/lmr/m/sc/12 internetes for-r·s\T1/lmr/m/n/12 : \T1/lmr/m/it/12 Re-act (so
 ft-ware)\T1/lmr/m/n/12 , [][]$\T1/lmtt/m/n/12 https : / / en . wikipedia . org 
 / wiki /
  []
 
 
-Underfull \hbox (badness 8038) in paragraph at lines 620--621
+Underfull \hbox (badness 8038) in paragraph at lines 610--611
 []\T1/lmr/m/sc/12 internetes for-r·s\T1/lmr/m/n/12 : \T1/lmr/m/it/12 Egy-sze-r∂
 , adat-ve-zÈ-relt CRUD-mikroszolg·ltat·s lÈt-
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 620--621
+Underfull \hbox (badness 10000) in paragraph at lines 610--611
 \T1/lmr/m/it/12 re-ho-z·-sa\T1/lmr/m/n/12 , [][]$\T1/lmtt/m/n/12 https : / / le
 arn . microsoft . com / hu-[]hu / dotnet / architecture /
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 620--621
+Underfull \hbox (badness 10000) in paragraph at lines 610--611
 \T1/lmtt/m/n/12 microservices / multi-[]container-[]microservice-[]net-[]applic
 ations /
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 622--623
+Underfull \hbox (badness 10000) in paragraph at lines 612--613
 []\T1/lmr/m/sc/12 internetes for-r·s\T1/lmr/m/n/12 : \T1/lmr/m/it/12 Adat-b·-zi
 s ke-ze-lÈ-se En-tity Fra-
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 622--623
+Underfull \hbox (badness 10000) in paragraph at lines 612--613
 \T1/lmr/m/it/12 me-work se-gÌt-sÈ-gÈ-vel\T1/lmr/m/n/12 , [][]$\T1/lmtt/m/n/12 h
 ttps : / / csharptutorial . hu / docs /
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 622--623
+Underfull \hbox (badness 10000) in paragraph at lines 612--613
 \T1/lmtt/m/n/12 hellovilag-[]hellocsharp / 15-[]adatbazis-[]kezeles-[]entity-[]
 framework-[]el /
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 624--626
+Underfull \hbox (badness 10000) in paragraph at lines 614--616
 \T1/lmr/m/it/12 Co-re \T1/lmr/m/n/12 ,[][]$\T1/lmtt/m/n/12 https : / / learn . 
 microsoft . com / en-[]us / aspnet / core / tutorials /
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 624--626
+Underfull \hbox (badness 10000) in paragraph at lines 614--616
 \T1/lmtt/m/n/12 first-[]web-[]api ? view = aspnetcore-[]9 . 0 & tabs = visual-[
 ]studio$[][]\T1/lmr/m/n/12 ,Letˆltve: 2025
  []
 
-<tabla.png, id=477, 404.51125pt x 624.3325pt>
-File: tabla.png Graphic file (type png)
-<use tabla.png>
-Package pdftex.def Info: tabla.png  used on input line 633.
-(pdftex.def)             Requested size: 441.01773pt x 680.68996pt.
+<es.png, id=433, 543.02875pt x 469.755pt>
+File: es.png Graphic file (type png)
+<use es.png>
+Package pdftex.def Info: es.png  used on input line 623.
+(pdftex.def)             Requested size: 441.01773pt x 381.52448pt.
 [22
 
-] [23 <./tabla.png>] (thesis-kando-template-szoftver.aux)
+] [23 <./es.png>] (thesis-kando-template-szoftver.aux)
  ***********
 LaTeX2e <2023-11-01> patch level 1
 L3 programming layer <2024-01-04>
  ***********
-
-
-Package rerunfilecheck Warning: File `thesis-kando-template-szoftver.out' has c
-hanged.
-(rerunfilecheck)                Rerun to get outlines right
-(rerunfilecheck)                or use package `bookmark'.
-
-Package rerunfilecheck Info: Checksums for `thesis-kando-template-szoftver.out'
-:
-(rerunfilecheck)             Before: 1EE546CB3BA4D1F701E7B7342F7D4FCA;4261
-(rerunfilecheck)             After:  F91745BD5C1DEB3D6F08F861FC430711;4219.
+Package rerunfilecheck Info: File `thesis-kando-template-szoftver.out' has not 
+changed.
+(rerunfilecheck)             Checksum: 5F873CFC800D72D250AE79BECC54E612;2751.
  ) 
 Here is how much of TeX's memory you used:
- 37055 strings out of 474486
- 785530 string characters out of 5743283
+ 37082 strings out of 474486
+ 786324 string characters out of 5743283
  2115542 words of memory out of 5000000
- 58499 multiletter control sequences out of 15000+600000
+ 58528 multiletter control sequences out of 15000+600000
  625017 words of font info for 91 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
  98i,7n,101p,1929b,2055s stack positions out of 10000i,1000n,20000p,200000b,200000s
@@ -1435,9 +1569,9 @@ pfb><C:/Users/Vizsga/AppData/Local/Programs/MiKTeX/fonts/type1/public/lm/lmri12
 0.pfb><C:/Users/Vizsga/AppData/Local/Programs/MiKTeX/fonts/type1/public/lm/lmtt
 10.pfb><C:/Users/Vizsga/AppData/Local/Programs/MiKTeX/fonts/type1/public/lm/lmt
 t12.pfb>
-Output written on thesis-kando-template-szoftver.pdf (23 pages, 405083 bytes).
+Output written on thesis-kando-template-szoftver.pdf (23 pages, 517425 bytes).
 PDF statistics:
- 594 PDF objects out of 1000 (max. 8388607)
- 280 named destinations out of 1000 (max. 500000)
- 220 words of extra memory for PDF output out of 10000 (max. 10000000)
+ 551 PDF objects out of 1000 (max. 8388607)
+ 278 named destinations out of 1000 (max. 500000)
+ 148 words of extra memory for PDF output out of 10000 (max. 10000000)
 
