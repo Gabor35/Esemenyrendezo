@@ -120,8 +120,8 @@ const Login = () => {
               <Form onSubmit={handleLogin}>
                 <Form.Group className="mb-3">
                   <Form.Control
-                    type="email"
-                    placeholder="Email"
+                    type="text"
+                    placeholder="Felhasználónév"
                     value={loginEmail}
                     onChange={(e) => setLoginEmail(e.target.value)}
                     className="input-field"
