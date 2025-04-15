@@ -1,0 +1,11 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<!--
+https://go.microsoft.com/fwlink/?LinkID=208121.
+-->
+<Project>
+  <PropertyGroup>
+    <_PublishTargetUrl>C:\Users\ivancsika\Desktop\es-Backend\es-Backend\bin\Release\net8.0\publish\</_PublishTargetUrl>
+    <History>True|2025-02-28T09:34:12.7364642Z||;True|2025-02-28T10:33:17.3808789+01:00||;True|2025-02-11T09:54:42.6080576+01:00||;True|2025-01-27T09:30:08.7528272+01:00||;False|2025-01-27T09:29:55.9228529+01:00||;True|2025-01-22T11:43:18.4469881+01:00||;True|2025-01-22T08:31:22.3088626+01:00||;False|2025-01-22T08:30:07.1705857+01:00||;False|2025-01-22T08:29:41.8869753+01:00||;True|2025-01-21T10:30:24.1920624+01:00||;True|2025-01-21T10:03:37.9193167+01:00||;True|2025-01-15T11:29:58.4719007+01:00||;False|2025-01-15T11:29:43.0904560+01:00||;True|2025-01-15T09:02:30.1738392+01:00||;True|2025-01-15T08:18:51.5677458+01:00||;True|2025-01-15T08:17:21.5173821+01:00||;True|2025-01-15T08:09:20.7971482+01:00||;</History>
+    <LastFailureDetails />
+  </PropertyGroup>
+</Project>

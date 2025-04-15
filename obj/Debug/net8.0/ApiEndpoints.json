@@ -1,0 +1,527 @@
+[
+  {
+    "ContainingType": "esemenyrendezo.Controllers.BackupRestoreController",
+    "Method": "SQLBackupAsync",
+    "RelativePath": "api/BackupRestore/Backup/{uId},{fileName}",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "uId",
+        "Type": "System.String",
+        "IsRequired": true
+      },
+      {
+        "Name": "fileName",
+        "Type": "System.String",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "esemenyrendezo.Controllers.BackupRestoreController",
+    "Method": "SQLRestoreAsync",
+    "RelativePath": "api/BackupRestore/Restore/{uId}",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "uId",
+        "Type": "System.String",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "esemenyrendezo.Controllers.ChatMessageController",
+    "Method": "Get",
+    "RelativePath": "api/ChatMessage",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "esemenyrendezo.Controllers.ChatMessageController",
+    "Method": "Post",
+    "RelativePath": "api/ChatMessage/{token}",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "token",
+        "Type": "System.String",
+        "IsRequired": true
+      },
+      {
+        "Name": "message",
+        "Type": "esemenyrendezo.Models.ChatMessage",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "esemenyrendezo.Controllers.ChatMessageController",
+    "Method": "Put",
+    "RelativePath": "api/ChatMessage/{token}",
+    "HttpMethod": "PUT",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "token",
+        "Type": "System.String",
+        "IsRequired": true
+      },
+      {
+        "Name": "updatedMessage",
+        "Type": "esemenyrendezo.Models.ChatMessage",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "esemenyrendezo.Controllers.ChatMessageController",
+    "Method": "Delete",
+    "RelativePath": "api/ChatMessage/{token}/{id}",
+    "HttpMethod": "DELETE",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "token",
+        "Type": "System.String",
+        "IsRequired": true
+      },
+      {
+        "Name": "id",
+        "Type": "System.Int32",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "esemenyrendezo.Controllers.EsemenyController",
+    "Method": "Get",
+    "RelativePath": "api/Esemeny",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "esemenyrendezo.Controllers.EsemenyController",
+    "Method": "Post",
+    "RelativePath": "api/Esemeny/{token}",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "token",
+        "Type": "System.String",
+        "IsRequired": true
+      },
+      {
+        "Name": "esemeny",
+        "Type": "esemenyrendezo.Models.Esemeny",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "esemenyrendezo.Controllers.EsemenyController",
+    "Method": "Put",
+    "RelativePath": "api/Esemeny/{token}",
+    "HttpMethod": "PUT",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "token",
+        "Type": "System.String",
+        "IsRequired": true
+      },
+      {
+        "Name": "esemeny",
+        "Type": "esemenyrendezo.Models.Esemeny",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "esemenyrendezo.Controllers.EsemenyController",
+    "Method": "Delete",
+    "RelativePath": "api/Esemeny/{token},{id}",
+    "HttpMethod": "DELETE",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "token",
+        "Type": "System.String",
+        "IsRequired": true
+      },
+      {
+        "Name": "id",
+        "Type": "System.Int32",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "esemenyrendezo.Controllers.FileUploadController",
+    "Method": "FileUploadBackEnd",
+    "RelativePath": "api/FileUpload/BackEndServer",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "esemenyrendezo.Controllers.FileUploadController",
+    "Method": "FileUploadFtp",
+    "RelativePath": "api/FileUpload/FtpServer",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "esemenyrendezo.Controllers.JelszoController",
+    "Method": "ElfelejtettJelszo",
+    "RelativePath": "api/Jelszo/{Email}",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "Email",
+        "Type": "System.String",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "esemenyrendezo.Controllers.JelszoController",
+    "Method": "JelszoMosositas",
+    "RelativePath": "api/Jelszo/{loginName},{oldPassword},{newPassword}",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "loginName",
+        "Type": "System.String",
+        "IsRequired": true
+      },
+      {
+        "Name": "oldPassword",
+        "Type": "System.String",
+        "IsRequired": true
+      },
+      {
+        "Name": "newPassword",
+        "Type": "System.String",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "esemenyrendezo.Controllers.LoginController",
+    "Method": "Login",
+    "RelativePath": "api/Login",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "loginDTO",
+        "Type": "esemenyrendezo.DTOs.LoginDTO",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "esemenyrendezo.Controllers.LoginController",
+    "Method": "GetSalt",
+    "RelativePath": "api/Login/GetSalt/{felhasznaloNev}",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "felhasznaloNev",
+        "Type": "System.String",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "esemenyrendezo.Controllers.LogoutController",
+    "Method": "Logout",
+    "RelativePath": "api/Logout/{uId}",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "uId",
+        "Type": "System.String",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "esemenyrendezo.Controllers.RegisztracioController",
+    "Method": "Regisztracio",
+    "RelativePath": "api/Regisztracio",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "felhasznalo",
+        "Type": "esemenyrendezo.Models.Felhasznalo",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "esemenyrendezo.Controllers.RegisztracioController",
+    "Method": "Regisztraciobefejezese",
+    "RelativePath": "api/Regisztracio",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "felhasznaloNev",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "email",
+        "Type": "System.String",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "esemenyrendezo.Controllers.RegisztracioController",
+    "Method": "Get",
+    "RelativePath": "api/Regisztracio/{token},{id}",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "token",
+        "Type": "System.String",
+        "IsRequired": true
+      },
+      {
+        "Name": "id",
+        "Type": "System.Int32",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "esemenyrendezo.Controllers.ReszvetelController",
+    "Method": "SaveEvent",
+    "RelativePath": "api/Reszvetel/{token}/{esemenyId}",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "token",
+        "Type": "System.String",
+        "IsRequired": true
+      },
+      {
+        "Name": "esemenyId",
+        "Type": "System.Int32",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "esemenyrendezo.Controllers.ReszvetelController",
+    "Method": "UnsaveEvent",
+    "RelativePath": "api/Reszvetel/{token}/{esemenyId}",
+    "HttpMethod": "DELETE",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "token",
+        "Type": "System.String",
+        "IsRequired": true
+      },
+      {
+        "Name": "esemenyId",
+        "Type": "System.Int32",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "esemenyrendezo.Controllers.ReszvetelController",
+    "Method": "CheckIfSaved",
+    "RelativePath": "api/Reszvetel/check/{token}/{esemenyId}",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "token",
+        "Type": "System.String",
+        "IsRequired": true
+      },
+      {
+        "Name": "esemenyId",
+        "Type": "System.Int32",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "esemenyrendezo.Controllers.ReszvetelController",
+    "Method": "GetSavedEvents",
+    "RelativePath": "api/Reszvetel/saved/{token}",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "token",
+        "Type": "System.String",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "ProjektNeveBackend.Controllers.UserController",
+    "Method": "Get",
+    "RelativePath": "api/User/{token}",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "token",
+        "Type": "System.String",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "ProjektNeveBackend.Controllers.UserController",
+    "Method": "Post",
+    "RelativePath": "api/User/{token}",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "token",
+        "Type": "System.String",
+        "IsRequired": true
+      },
+      {
+        "Name": "felhasznalo",
+        "Type": "esemenyrendezo.Models.Felhasznalo",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "ProjektNeveBackend.Controllers.UserController",
+    "Method": "Put",
+    "RelativePath": "api/User/{token}",
+    "HttpMethod": "PUT",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "token",
+        "Type": "System.String",
+        "IsRequired": true
+      },
+      {
+        "Name": "felhasznalo",
+        "Type": "esemenyrendezo.Models.Felhasznalo",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "ProjektNeveBackend.Controllers.UserController",
+    "Method": "Delete",
+    "RelativePath": "api/User/{token},{id}",
+    "HttpMethod": "DELETE",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "token",
+        "Type": "System.String",
+        "IsRequired": true
+      },
+      {
+        "Name": "id",
+        "Type": "System.Int32",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "ProjektNeveBackend.Controllers.UserController",
+    "Method": "GetUserEmailName",
+    "RelativePath": "api/User/UserEmailName/{token}",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "token",
+        "Type": "System.String",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  }
+]
