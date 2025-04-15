@@ -1,88 +1,98 @@
+// Saved.jsx
 import React, { useState, useEffect } from 'react';
 import { Modal } from 'react-bootstrap';
-import axios from 'axios';
-import { useGlobalContext } from '../Context/GlobalContext';
 import { motion } from 'framer-motion';
+import { collection, query, where, getDocs, doc, getDoc, deleteDoc } from 'firebase/firestore';
+import { db } from './firebase2';
 import heartFillIcon from '../pictures/heart-fill.svg';
+import { useGlobalContext } from '../Context/GlobalContext';
 
-export const Saved = () => {
+const Saved = () => {
   const [savedEvents, setSavedEvents] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [selectedEvent, setSelectedEvent] = useState(null);
   const [showModal, setShowModal] = useState(false);
-  const { apiUrl } = useGlobalContext();
+  const { /*apiUrl*/ } = useGlobalContext();
 
+  // Read user info from localStorage; must include uid.
   const userData = JSON.parse(localStorage.getItem('felhasz'));
-  const token = userData ? userData.token : null;
+  const userUid = userData ? userData.uid : null;
 
-  const formatError = (err) => {
-    return err.response?.data?.toString?.() || err.message || JSON.stringify(err);
-  };
-
+  // Fetch saved events for the current user from the "savedEvents" collection
   useEffect(() => {
     const fetchSavedEvents = async () => {
       setLoading(true);
-      try {
-        if (!token) {
-          setError('Be kell jelentkezned a mentett események megtekintéséhez');
-          setLoading(false);
-          return;
-        }
+      if (!userUid) {
+        setError('You must be logged in to view saved events');
+        setLoading(false);
+        return;
+      }
 
-        const response = await axios.get(`${apiUrl}Reszvetel/saved/${token}`);
-        const formatted = response.data.map(event => ({
-          ...event,
-          Datum: new Date(event.datum),
-          Kepurl: `https://images-0prm.onrender.com/${event.kepurl}`,
-          Cime: event.cime,
-          Helyszin: event.helyszin,
-          Leiras: event.leiras
-        }));
-        setSavedEvents(formatted);
+      try {
+        // Query for saved events where userId equals the current user’s UID
+        const savedQuery = query(
+          collection(db, 'savedEvents'),
+          where('userId', '==', userUid)
+        );
+        const querySnapshot = await getDocs(savedQuery);
+        // For each saved event document, retrieve the event detail from "events" collection.
+        const eventPromises = querySnapshot.docs.map(async (docSnap) => {
+          const { eventId } = docSnap.data();
+          const eventDocRef = doc(db, 'events', eventId);
+          const eventDoc = await getDoc(eventDocRef);
+          if (eventDoc.exists()) {
+            return { id: eventDoc.id, ...eventDoc.data() };
+          }
+          return null;
+        });
+
+        const eventsData = (await Promise.all(eventPromises)).filter(Boolean);
+        setSavedEvents(eventsData);
         setError(null);
       } catch (err) {
-        setError('Nem sikerült lekérni a mentett eseményeket: ' + formatError(err));
-        setSavedEvents([]);
+        console.error("Error fetching saved events:", err);
+        setError("Error fetching saved events.");
       } finally {
         setLoading(false);
       }
     };
 
     fetchSavedEvents();
-  }, [token, apiUrl]);
+  }, [userUid]);
 
   const handleShowDetails = (event) => {
     setSelectedEvent(event);
     setShowModal(true);
   };
 
+  // To unsave an event, remove the corresponding document from "savedEvents"
   const handleUnsaveEvent = async (eventId, e) => {
     e.preventDefault();
-    if (!token) {
-      setError('Be kell jelentkezned az esemény eltávolításához');
+    if (!userUid) {
+      setError('You must be logged in to unsave an event');
       return;
     }
+
     try {
-      await axios.delete(`${apiUrl}Reszvetel/${token}/${eventId}`);
+      // Build the document ID as in EventList.jsx
+      const docId = `${userUid}_${eventId}`;
+      // Delete the document from Firestore
+      await deleteDoc(doc(db, 'savedEvents', docId));
+      // Remove event from the local state
       setSavedEvents(prev => prev.filter(event => event.id !== eventId));
     } catch (err) {
-      setError('Nem sikerült eltávolítani az eseményt: ' + formatError(err));
+      console.error("Error unsaving event:", err);
+      setError("Error unsaving event.");
     }
   };
 
-  if (loading) {
-    return <div className="container mt-4">Mentett események betöltése...</div>;
-  }
-
-  if (error) {
-    return <div className="container mt-4 alert alert-danger">{error}</div>;
-  }
-
+  if (loading) return <div className="container mt-4">Loading saved events...</div>;
+  if (error) return <div className="container mt-4 alert alert-danger">{error}</div>;
   if (savedEvents.length === 0) {
     return (
       <div className="container mt-4 d-flex justify-content-center align-items-center" style={{ height: "100vh", fontSize: "30px" }}>
-        <div className="text-white">Nincsenek mentések!</div>
+        <div>No saved events!</div>
       </div>
     );
   }
@@ -109,15 +119,15 @@ export const Saved = () => {
               )}
               <div className="card-body">
                 <h5 className="card-title">{event.Cime}</h5>
-                <p className="card-text">Dátum: {new Date(event.Datum).toLocaleString()}</p>
-                <p className="card-text">Helyszín: {event.Helyszin}</p>
+                <p className="card-text">Date: {new Date(event.Datum?.seconds ? event.Datum.seconds * 1000 : event.Datum).toLocaleString()}</p>
+                <p className="card-text">Location: {event.Helyszin}</p>
                 <motion.button
                   className="btn btn-secondary"
                   onClick={() => handleShowDetails(event)}
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
                 >
-                  Részletek
+                  Details
                 </motion.button>
                 <div style={{ display: 'inline-block', marginLeft: '10px' }}>
                   <button
@@ -151,9 +161,9 @@ export const Saved = () => {
               style={{ width: '100%', objectFit: 'cover' }}
             />
           )}
-          <p><strong>Dátum:</strong> {new Date(selectedEvent?.Datum).toLocaleString()}</p>
-          <p><strong>Helyszín:</strong> {selectedEvent?.Helyszin}</p>
-          <p><strong>Leírás:</strong> {selectedEvent?.Leiras}</p>
+          <p><strong>Date:</strong> {new Date(selectedEvent?.Datum?.seconds ? selectedEvent.Datum.seconds * 1000 : selectedEvent.Datum).toLocaleString()}</p>
+          <p><strong>Location:</strong> {selectedEvent?.Helyszin}</p>
+          <p><strong>Description:</strong> {selectedEvent?.Leiras}</p>
         </Modal.Body>
         <Modal.Footer>
           <motion.button
@@ -162,7 +172,7 @@ export const Saved = () => {
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
           >
-            Bezárás
+            Close
           </motion.button>
         </Modal.Footer>
       </Modal>

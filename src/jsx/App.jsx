@@ -4,7 +4,7 @@ import { BrowserRouter as Router, Routes, Route, NavLink, useLocation } from "re
 import "bootstrap/dist/css/bootstrap.min.css";
 import "bootstrap/dist/js/bootstrap.bundle.min";
 import { motion } from "framer-motion";
-import { Login } from "../UsersLogin/Login";
+import Login from "../UsersLogin/Login";
 import { Register } from "../UsersLogin/Register";
 import ForgotPassword from "./ForgotPassword";
 import AddEvent from "./AddEvent";
@@ -13,7 +13,7 @@ import logo from "../pictures/logo.jpg";
 import hatterGif from "../pictures/background.jpg";
 import Chat from "./chat";
 import { Calendar } from "./calendar";
-import { Saved } from "./saved";
+import  Saved  from "./saved";
 import Esemenyek from "./Esemenyek";
 import axios from "axios";
 import Aboutus from "./aboutus";

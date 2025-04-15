@@ -1,21 +1,22 @@
 import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { useGlobalContext } from "../Context/GlobalContext";
-import axios from "axios";
-import { sha256 } from "js-sha256";
 import { useNavigate } from "react-router-dom";
 import { Container, Card, Form, Button, Image } from "react-bootstrap";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "./login.css";
 
-export const Login = () => {
-  const [loginName, setLoginName] = useState("");
+// Import Firebase Auth and the sign in function
+import { auth } from "../jsx/firebase2";
+import { signInWithEmailAndPassword } from "firebase/auth";
+
+const Login = () => {
+  const [loginEmail, setLoginEmail] = useState("");
   const [password, setPassword] = useState("");
   const [user, setUser] = useState(null);
   const [avatar, setAvatar] = useState("");
 
   const {
-    apiUrl,
     ftpUrl,
     loggedUser,
     setLoggedUser,
@@ -26,83 +27,62 @@ export const Login = () => {
 
   const navigate = useNavigate();
 
+  // When the component loads, check if a user is already logged in (stored in localStorage)
   useEffect(() => {
-    if (loggedIn) {
-      alert(loggedUser?.name || loginName + "sikeresen bejelentkezett!");
-    }
     const storedUser = JSON.parse(localStorage.getItem("felhasz"));
     if (storedUser) {
       setUser(storedUser);
-      setAvatar(`${ftpUrl}${storedUser.profilePicturePath}`);
+      setLoggedUser(storedUser);
+      setLoggedUserName(storedUser.name || storedUser.email);
       navigate("/events");
     }
-  }, [navigate, loggedIn]);
+  }, [navigate, loggedIn, setLoggedUser, setLoggedUserName]);
 
-  const handleLogout = async () => {
-    if (user?.token) {
-      try {
-        await axios.post(`${apiUrl}Logout/${user.token}`);
-        console.log("Kijelentkezés sikeres!");
-      } catch (error) {
-        console.error("Hiba történt a kijelentkezés során:", error);
-      }
+  // Handle user login using Firebase Auth
+  const handleLogin = async (e) => {
+    e.preventDefault();
+    if (!loginEmail || !password) {
+      alert("Please fill in both fields!");
+      return;
     }
-    localStorage.removeItem("felhasz");
-    setUser(null);
-    setAvatar("");
-    console.log("Sikeres kijelentkezés!");
-    navigate("/login");
-  };
-
-  const handleLogin = async () => {
     try {
-      if (!loginName || !password) {
-        alert("Kérjük, töltse ki mindkét mezőt!");
-        return;
-      }
+      const userCredential = await signInWithEmailAndPassword(auth, loginEmail, password);
+      const userObject = userCredential.user;
+      // Build a normalized user object containing at least the uid
+      const normalizedUser = {
+        uid: userObject.uid,
+        email: userObject.email,
+        name: userObject.displayName || loginEmail,
+        profilePicturePath: userObject.photoURL || ""
+      };
 
-      const { data: salt } = await axios.post(`${apiUrl}Login/GetSalt/${loginName}`);
-      const tmpHash = sha256(password + salt.toString());
-
-      const { data: userData } = await axios.post(`${apiUrl}Login`, {
-        loginName,
-        tmpHash
-      });
-
-      if (userData) {
-        const normalizedUser = {
-          ...userData,
-          name:
-            userData.name ||
-            userData.Name ||
-            userData.teljesNev ||
-            userData.felhasznaloNev ||
-            loginName,
-          profilePicturePath:
-            userData.profilePicturePath ||
-            userData.ProfilePicturePath ||
-            userData.fenykepUtvonal ||
-            ''
-        };
-
-        setLoggedUser(normalizedUser);
-        setLoggedUserName(normalizedUser.name);
-        setLoggedIn(true);
-        localStorage.setItem("felhasz", JSON.stringify(normalizedUser));
-        setUser(normalizedUser);
+      setLoggedUser(normalizedUser);
+      setLoggedUserName(normalizedUser.name);
+      setLoggedIn(true);
+      // Store the user object in localStorage under "felhasz"
+      localStorage.setItem("felhasz", JSON.stringify(normalizedUser));
+      setUser(normalizedUser);
+      if (normalizedUser.profilePicturePath) {
         setAvatar(`${ftpUrl}${normalizedUser.profilePicturePath}`);
-        navigate("/events");
       }
+      navigate("/events");
     } catch (error) {
-      alert("Hiba történt: " + (error.response?.data?.message || error.message));
+      alert("Error: " + error.message);
     }
   };
 
-  const handleLoginWithRefresh = () => {
-    handleLogin();
-    setTimeout(() => {
-      window.location.reload();
-    }, 1000);
+  // Handle user logout by signing out of Firebase Auth and removing local storage
+  const handleLogout = async () => {
+    try {
+      await auth.signOut();
+      localStorage.removeItem("felhasz");
+      setUser(null);
+      setLoggedUser(null);
+      setLoggedIn(false);
+      navigate("/login");
+    } catch (error) {
+      console.error("Error logging out", error);
+    }
   };
 
   return (
@@ -116,7 +96,7 @@ export const Login = () => {
         <Card className="glass-card p-4">
           {user ? (
             <Card.Body className="text-center">
-              <h2 className="title">Üdv, {user.name}!</h2>
+              <h2 className="title">Welcome, {user.name}!</h2>
               {avatar && (
                 <Image
                   src={avatar}
@@ -131,26 +111,26 @@ export const Login = () => {
                 onClick={handleLogout}
                 className="w-100 logout-btn"
               >
-                Kijelentkezés
+                Logout
               </Button>
             </Card.Body>
           ) : (
             <Card.Body>
-              <h2 className="text-center title text-info">Bejelentkezés</h2>
-              <Form>
+              <h2 className="text-center title text-info">Login</h2>
+              <Form onSubmit={handleLogin}>
                 <Form.Group className="mb-3">
                   <Form.Control
                     type="email"
-                    placeholder="Felhasználónév"
-                    value={loginName}
-                    onChange={(e) => setLoginName(e.target.value)}
+                    placeholder="Email"
+                    value={loginEmail}
+                    onChange={(e) => setLoginEmail(e.target.value)}
                     className="input-field"
                   />
                 </Form.Group>
                 <Form.Group className="mb-3">
                   <Form.Control
                     type="password"
-                    placeholder="Jelszó"
+                    placeholder="Password"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     className="input-field"
@@ -158,17 +138,10 @@ export const Login = () => {
                 </Form.Group>
                 <Button
                   variant="primary"
+                  type="submit"
                   className="w-100 login-btn"
-                  onClick={handleLoginWithRefresh}
                 >
-                  Bejelentkezés
-                </Button>
-                <Button
-                  variant="link"
-                  className="w-100 mt-2 forgot-password-btn"
-                  onClick={() => navigate("/ForgotPassword")}
-                >
-                  Elfelejtett jelszó?
+                  Login
                 </Button>
               </Form>
             </Card.Body>
@@ -178,3 +151,5 @@ export const Login = () => {
     </Container>
   );
 };
+
+export default Login;
