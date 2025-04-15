@@ -24,6 +24,7 @@ const Saved = () => {
 
   // Get user data from localStorage
   const userData = JSON.parse(localStorage.getItem('felhasz'));
+  console.log("User data:", userData);
 
   // Fetch saved event IDs from "saveEvents" and then retrieve event details from "events"
   useEffect(() => {
@@ -38,27 +39,33 @@ const Saved = () => {
       }
 
       try {
+        // Query saveEvents by the current user's name.
         const savesQuery = query(
           collection(db, "saveEvents"),
           where("userId", "==", userData.name)
         );
         const savesSnapshot = await getDocs(savesQuery);
+        console.log("Found saveEvents docs:", savesSnapshot.docs.length);
 
         // Use Promise.all to fetch all event details concurrently.
         const eventPromises = savesSnapshot.docs.map(async (docSnap) => {
           const { eventId } = docSnap.data();
-          // Ensure that eventId is treated as a string.
+          console.log("Fetching event for eventId:", eventId);
+          // Ensure eventId is a string.
           const eventRef = doc(db, "events", String(eventId));
           const eventSnap = await getDoc(eventRef);
           if (eventSnap.exists()) {
+            console.log("Event found:", eventSnap.data());
             return { eventId, ...eventSnap.data() };
           } else {
+            console.warn(`Event not found for eventId: ${eventId}`);
             return null;
           }
         });
 
         const eventsData = await Promise.all(eventPromises);
-        // Filter out any null results in case an event does not exist
+        console.log("Fetched events data:", eventsData);
+        // Filter out any null results (in case an event was not found)
         const filteredEvents = eventsData.filter((event) => event !== null);
         setSavedEvents(filteredEvents);
       } catch (err) {
