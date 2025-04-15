@@ -46,7 +46,8 @@ const Saved = () => {
         // Get the event details for each saved event ID
         const eventPromises = savesSnapshot.docs.map(async (docSnap) => {
           const eventId = docSnap.data().eventId;
-          const eventDocRef = doc(db, "events", eventId);
+          // Convert eventId to string to ensure it works with doc() function
+          const eventDocRef = doc(db, "events", String(eventId));
           const eventDoc = await getDoc(eventDocRef);
          
           if (eventDoc.exists()) {
