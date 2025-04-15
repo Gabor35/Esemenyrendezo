@@ -14,7 +14,7 @@ import hatterGif from "../pictures/background.jpg";
 import Chat from "./chat";
 import { Calendar } from "./calendar";
 import  Saved  from "./saved";
-import Esemenyek from "./Esemenyek";
+import Esemenyek from "./Esemenyek";  // If you still need this, rename the route below
 import axios from "axios";
 import Aboutus from "./aboutus";
 import gear from "../pictures/gear-fill.svg";
@@ -51,7 +51,7 @@ const AppContent = () => {
     if (storedUser) {
       setUser(storedUser);
     }
-   
+
     // Fetch events from Firestore instead of API
     const fetchEvents = async () => {
       try {
@@ -68,7 +68,7 @@ const AppContent = () => {
         setLoading(false);
       }
     };
-   
+
     fetchEvents();
     setupAxiosDefaults();
   }, []);
@@ -93,7 +93,7 @@ const AppContent = () => {
     const eventDate = event.Datum?.seconds
       ? new Date(event.Datum.seconds * 1000)
       : new Date(event.Datum);
-   
+
     // Date filtering
     const isDateMatch = filterDate
       ? eventDate.toLocaleDateString() === new Date(filterDate).toLocaleDateString()
@@ -332,7 +332,7 @@ const AppContent = () => {
             <div className="col-12">
               <div className="p-3 bg-light rounded shadow-sm">
                 <div className="d-flex flex-row align-items-center gap-3">
-                  {/* List/Grid View Button moved to front */}
+                  {/* List/Grid View Button */}
                   <motion.button
                     className="btn"
                     onClick={() => setIsGridView(!isGridView)}
@@ -408,15 +408,24 @@ const AppContent = () => {
         )}
 
         <Routes>
+          {/* IMPORTANT: Keep only ONE route for /events so EventList actually renders */}
           <Route
             path="/events"
             element={<EventList events={filteredEvents} isGridView={isGridView} />}
           />
+
           <Route path="/" element={<Login />} />
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
           <Route path="/forgotpassword" element={<ForgotPassword />} />
-          <Route path="/events" element={<Esemenyek />} />
+
+          {/*
+            If you still want to use Esemenyek for some reason,
+            give it a different path like "/esemenyek" 
+            instead of also /events.
+          */}
+          <Route path="/esemenyek" element={<Esemenyek />} />
+
           <Route path="/chat" element={<Chat />} />
           <Route path="/calendar" element={<Calendar />} />
           <Route path="/saved" element={<Saved />} />
