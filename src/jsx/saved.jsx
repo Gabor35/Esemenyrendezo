@@ -1,20 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { Modal } from 'react-bootstrap';
 import { motion } from 'framer-motion';
-import {
-  collection,
-  getDocs,
-  query,
-  where,
-  deleteDoc,
-  doc,
-  getDoc
-} from 'firebase/firestore';
+import { collection, getDocs, query, where, deleteDoc, doc } from 'firebase/firestore';
 import { db } from './firebase2';
 import heartFillIcon from '../pictures/heart-fill.svg';
 import { useGlobalContext } from '../Context/GlobalContext';
 
 const Saved = () => {
+  const [allEvents, setAllEvents] = useState([]);
   const [savedEvents, setSavedEvents] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -26,7 +19,24 @@ const Saved = () => {
   const userData = JSON.parse(localStorage.getItem('felhasz'));
   console.log("User data:", userData);
 
-  // Fetch saved event IDs from "saveEvents" and then retrieve event details from "events"
+  // First, fetch all events from the "events" collection.
+  useEffect(() => {
+    const fetchAllEvents = async () => {
+      try {
+        const eventsSnapshot = await getDocs(query(collection(db, 'events')));
+        const eventsData = eventsSnapshot.docs.map(docSnap => ({
+          id: docSnap.id,
+          ...docSnap.data()
+        }));
+        setAllEvents(eventsData);
+      } catch (err) {
+        console.error("Error fetching all events:", err);
+      }
+    };
+    fetchAllEvents();
+  }, []);
+
+  // Then, fetch saved event IDs and filter the full events list.
   useEffect(() => {
     const fetchSavedEvents = async () => {
       setLoading(true);
@@ -39,69 +49,52 @@ const Saved = () => {
       }
 
       try {
-        // Query saveEvents by the current user's name.
+        // Query saveEvents documents for the current user.
         const savesQuery = query(
           collection(db, "saveEvents"),
           where("userId", "==", userData.name)
         );
         const savesSnapshot = await getDocs(savesQuery);
-        console.log("Found saveEvents docs:", savesSnapshot.docs.length);
+        const savedIds = savesSnapshot.docs.map(docSnap => docSnap.data().eventId.toString());
+        console.log("Saved event IDs:", savedIds);
 
-        // Use Promise.all to fetch all event details concurrently.
-        const eventPromises = savesSnapshot.docs.map(async (docSnap) => {
-          const { eventId } = docSnap.data();
-          console.log("Looking up event for eventId:", eventId);
-          // Use eventId.toString() for document lookup.
-          const eventRef = doc(db, "events", eventId.toString());
-          const eventSnap = await getDoc(eventRef);
-          if (eventSnap.exists()) {
-            console.log("Found event document:", eventSnap.id);
-            return { eventId, ...eventSnap.data() };
-          } else {
-            console.warn(`Event not found for eventId: ${eventId}`);
-            return null;
-          }
-        });
-
-        const eventsData = await Promise.all(eventPromises);
-        console.log("Fetched events data:", eventsData);
-        // Filter out any null results (in case an event was not found)
-        const filteredEvents = eventsData.filter((event) => event !== null);
-        setSavedEvents(filteredEvents);
+        // Filter allEvents to only include those that are saved.
+        const filtered = allEvents.filter(ev => savedIds.includes(ev.id));
+        console.log("Filtered saved events:", filtered);
+        setSavedEvents(filtered);
       } catch (err) {
-        console.error("Error fetching saved events: ", err);
+        console.error("Error fetching saved events:", err);
         setError("Nem sikerült lekérni a mentett eseményeket: " + err.message);
-        setSavedEvents([]);
       } finally {
         setLoading(false);
       }
     };
 
+    // Run the saved events query whenever the list of all events is updated.
     fetchSavedEvents();
-  }, [userData]);
+  }, [userData, allEvents]);
 
-  // Show modal with event details
+  // Show modal with event details.
   const handleShowDetails = (event) => {
     setSelectedEvent(event);
     setShowModal(true);
   };
 
-  // Remove the saved event by deleting from "saveEvents" collection
+  // Remove the saved event by deleting its document from the "saveEvents" collection.
   const handleUnsaveEvent = async (eventId, e) => {
     e.preventDefault();
     if (!userData) {
       setError('Be kell jelentkezned az esemény eltávolításához');
       return;
     }
+    // Document ID format: userName_eventId
     const compositeId = `${userData.name}_${eventId}`;
     try {
       await deleteDoc(doc(db, "saveEvents", compositeId));
-      setSavedEvents((prev) =>
-        prev.filter((event) => event.eventId !== eventId)
-      );
+      setSavedEvents(prev => prev.filter(ev => ev.id !== eventId));
     } catch (err) {
-      console.error("Error unsaving event: ", err);
-      setError('Nem sikerült eltávolítani az eseményt: ' + err.message);
+      console.error("Error unsaving event:", err);
+      setError("Nem sikerült eltávolítani az eseményt: " + err.message);
     }
   };
 
@@ -115,10 +108,7 @@ const Saved = () => {
 
   if (savedEvents.length === 0) {
     return (
-      <div
-        className="container mt-4 d-flex justify-content-center align-items-center"
-        style={{ height: "100vh", fontSize: "30px" }}
-      >
+      <div className="container mt-4 d-flex justify-content-center align-items-center" style={{ height: "100vh", fontSize: "30px" }}>
         <div className="text-white">Nincsenek mentések!</div>
       </div>
     );
@@ -130,7 +120,7 @@ const Saved = () => {
         {savedEvents.map((event, index) => (
           <motion.div
             className="col-md-4"
-            key={event.eventId}
+            key={event.id}
             initial={{ opacity: 0, y: 50 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: index * 0.1, duration: 0.5 }}
@@ -163,13 +153,8 @@ const Saved = () => {
                 </motion.button>
                 <div style={{ display: 'inline-block', marginLeft: '10px' }}>
                   <button
-                    style={{
-                      background: 'none',
-                      border: 'none',
-                      cursor: 'pointer',
-                      padding: '5px'
-                    }}
-                    onClick={(e) => handleUnsaveEvent(event.eventId, e)}
+                    style={{ background: 'none', border: 'none', cursor: 'pointer', padding: '5px' }}
+                    onClick={(e) => handleUnsaveEvent(event.id, e)}
                   >
                     <motion.img
                       src={heartFillIcon}
