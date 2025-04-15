@@ -1,4 +1,3 @@
-// App.jsx
 import { GlobalProvider } from "../Context/GlobalContext";
 import React, { useState, useEffect } from "react";
 import { BrowserRouter as Router, Routes, Route, NavLink, useLocation } from "react-router-dom";
@@ -7,15 +6,13 @@ import "bootstrap/dist/js/bootstrap.bundle.min";
 import { motion } from "framer-motion";
 import { Login } from "../UsersLogin/Login";
 import { Register } from "../UsersLogin/Register";
-import ForgotPassword from "./ForgotPassword";
 import AddEvent from "./AddEvent";
-import EventList from "./EventList";
+import EventList  from "./EventList";
 import logo from "../pictures/logo.jpg";
 import hatterGif from "../pictures/background.jpg";
 import Chat from "./chat";
 import { Calendar } from "./calendar";
-import Saved from "./saved";
-import Esemenyek from "./Esemenyek";  // Reassigned to a different route (if still needed)
+import  Saved  from "./saved";
 import axios from "axios";
 import Aboutus from "./aboutus";
 import gear from "../pictures/gear-fill.svg";
@@ -52,7 +49,7 @@ const AppContent = () => {
     if (storedUser) {
       setUser(storedUser);
     }
-    
+   
     // Fetch events from Firestore instead of API
     const fetchEvents = async () => {
       try {
@@ -69,7 +66,7 @@ const AppContent = () => {
         setLoading(false);
       }
     };
-
+   
     fetchEvents();
     setupAxiosDefaults();
   }, []);
@@ -77,29 +74,42 @@ const AppContent = () => {
   const handleAddEvent = (newEvent) => {
     setEvents((prevEvents) => {
       const updatedEvents = [...prevEvents, newEvent];
-      // Sort events by date. Datum is stored as string,
-      // so a simple Date constructor works if the string is ISO formatted.
-      updatedEvents.sort((a, b) => new Date(a.Datum) - new Date(b.Datum));
+      // Sort events by date (for Firestore timestamp objects)
+      updatedEvents.sort((a, b) => {
+        const dateA = a.Datum?.seconds ? new Date(a.Datum.seconds * 1000) : new Date(a.Datum);
+        const dateB = b.Datum?.seconds ? new Date(b.Datum.seconds * 1000) : new Date(b.Datum);
+        return dateA - dateB;
+      });
       return updatedEvents;
     });
     setIsModalOpen(false);
   };
 
-  // UPDATED FILTERING LOGIC: All fields (including Datum) are stored as string.
+  // Updated filtering logic for Firestore data structure
   const filteredEvents = events.filter((event) => {
-    const eventDateString = event.Datum || "";
-    // Extract date part: "YYYY-MM-DD"
-    const eventDatePart = eventDateString.slice(0, 10);
-    // Extract time part: "HH:MM"
-    const eventTimePart = eventDateString.slice(11, 16);
-
-    const isDateMatch = filterDate ? eventDatePart === filterDate : true;
-    const isTimeMatch = filterTime ? eventTimePart === filterTime : true;
-    const isLocationMatch = filterLocation
-      ? (event.Helyszin ? event.Helyszin.toLowerCase().includes(filterLocation.toLowerCase()) : false)
+    // Handle Firestore timestamp objects
+    const eventDate = event.Datum?.seconds
+      ? new Date(event.Datum.seconds * 1000)
+      : new Date(event.Datum);
+   
+    // Date filtering
+    const isDateMatch = filterDate
+      ? eventDate.toLocaleDateString() === new Date(filterDate).toLocaleDateString()
       : true;
+
+    // Time filtering
+    const isTimeMatch = filterTime
+      ? eventDate.toLocaleTimeString().includes(filterTime)
+      : true;
+
+    // Location filtering - using Helyszin instead of helyszin (case sensitive in Firestore)
+    const isLocationMatch = filterLocation
+      ? event.Helyszin?.toLowerCase().includes(filterLocation.toLowerCase())
+      : true;
+
+    // Name filtering - using Cime instead of cime (case sensitive in Firestore)
     const isNameMatch = filterName
-      ? (event.Cime ? event.Cime.toLowerCase().includes(filterName.toLowerCase()) : false)
+      ? event.Cime?.toLowerCase().includes(filterName.toLowerCase())
       : true;
 
     return isDateMatch && isTimeMatch && isLocationMatch && isNameMatch;
@@ -314,12 +324,13 @@ const AppContent = () => {
 
       <div className="container mt-4">
         {/* Only show filter controls when on the events page */}
+
         {isEventListPage && (
           <div className="row mb-4">
             <div className="col-12">
               <div className="p-3 bg-light rounded shadow-sm">
                 <div className="d-flex flex-row align-items-center gap-3">
-                  {/* List/Grid View Button */}
+                  {/* List/Grid View Button moved to front */}
                   <motion.button
                     className="btn"
                     onClick={() => setIsGridView(!isGridView)}
@@ -372,6 +383,7 @@ const AppContent = () => {
                     />
                   </div>
 
+                  {/* Clear Filters Button */}
                   <motion.button
                     className="btn btn-secondary"
                     onClick={() => {
@@ -394,20 +406,13 @@ const AppContent = () => {
         )}
 
         <Routes>
-          {/* Route for filtered events */}
           <Route
             path="/events"
             element={<EventList events={filteredEvents} isGridView={isGridView} />}
           />
-
           <Route path="/" element={<Login />} />
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
-          <Route path="/forgotpassword" element={<ForgotPassword />} />
-
-          {/* If you still need Esemenyek, assign a unique path */}
-          <Route path="/esemenyek" element={<Esemenyek />} />
-
           <Route path="/chat" element={<Chat />} />
           <Route path="/calendar" element={<Calendar />} />
           <Route path="/saved" element={<Saved />} />
@@ -416,7 +421,7 @@ const AppContent = () => {
         </Routes>
       </div>
 
-      {/* Modal for adding a new event */}
+      {/* Modal window */}
       {isModalOpen && (
         <div className="modal show" tabIndex="-1" style={{ display: "block" }}>
           <div className="modal-dialog">

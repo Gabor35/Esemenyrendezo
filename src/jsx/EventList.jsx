@@ -42,7 +42,7 @@ const EventList = ({ events: initialEvents = [], isGridView = false }) => {
             id: docSnap.id,
             ...docSnap.data()
           }));
-          setEvents(eventsData);
+          setEvents(eventsData);  // Now safe to call setEvents
           setLoading(false);
         } catch (e) {
           console.error("Hiba történt az események lekérésekor: ", e);
@@ -60,7 +60,7 @@ const EventList = ({ events: initialEvents = [], isGridView = false }) => {
     const fetchSavedStatus = async () => {
       if (!userData || !events.length) return;
       try {
-        // Query all docs in top-level 'saveEvents' where userId == userData.name
+        // Pull all savedEvents docs for this user
         const q = query(
           collection(db, 'saveEvents'),
           where('userId', '==', userData.name)
