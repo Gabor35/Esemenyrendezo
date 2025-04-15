@@ -50,12 +50,12 @@ const Saved = () => {
         // Use Promise.all to fetch all event details concurrently.
         const eventPromises = savesSnapshot.docs.map(async (docSnap) => {
           const { eventId } = docSnap.data();
-          console.log("Fetching event for eventId:", eventId);
-          // Ensure eventId is a string.
-          const eventRef = doc(db, "events", String(eventId));
+          console.log("Looking up event for eventId:", eventId);
+          // Use eventId.toString() for document lookup.
+          const eventRef = doc(db, "events", eventId.toString());
           const eventSnap = await getDoc(eventRef);
           if (eventSnap.exists()) {
-            console.log("Event found:", eventSnap.data());
+            console.log("Found event document:", eventSnap.id);
             return { eventId, ...eventSnap.data() };
           } else {
             console.warn(`Event not found for eventId: ${eventId}`);
