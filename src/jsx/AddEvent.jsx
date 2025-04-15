@@ -108,6 +108,7 @@ const AddEvent = ({ onAddEvent }) => {
             onChange={handleInputChange}
             className="form-control"
             placeholder="Kép URL-je"
+            required
           />
           {/* Display image preview if image URL is provided */}
           {newEvent.Kepurl && (
