@@ -28,7 +28,7 @@ const EventList = ({ events: initialEvents = [], isGridView = false }) => {
   // Get user data from localStorage
   const userData = JSON.parse(localStorage.getItem("felhasz"));
 
-  // On mount, if no events passed down, fetch from Firestore
+  // When no events are passed as props, fetch events from Firestore.
   useEffect(() => {
     const fetchEvents = async () => {
       try {
@@ -50,17 +50,16 @@ const EventList = ({ events: initialEvents = [], isGridView = false }) => {
     if (!initialEvents.length) {
       fetchEvents();
     } else {
-      // Use already passed events from the parent
+      // Use already passed events from parent
       setLoading(false);
     }
   }, [initialEvents]);
 
-  // Client‑side lookup to determine which events are saved
+  // Check saved events for the current user using the "saveEvents" collection.
   useEffect(() => {
     const fetchSavedStatus = async () => {
       if (!userData || !events.length) return;
       try {
-        // Fetch all saved events for the logged-in user from Firestore
         const q = query(
           collection(db, "saveEvents"),
           where("userId", "==", userData.name)
@@ -79,7 +78,7 @@ const EventList = ({ events: initialEvents = [], isGridView = false }) => {
     fetchSavedStatus();
   }, [events, userData]);
 
-  // Toggle saving/unsaving an event with Firestore (collection "saveEvents")
+  // Toggle saving/unsaving an event in the "saveEvents" collection.
   const handleHeartClick = async (eventId, e) => {
     e.preventDefault();
     if (!userData) {
@@ -90,10 +89,8 @@ const EventList = ({ events: initialEvents = [], isGridView = false }) => {
     const compositeId = `${userId}_${eventId}`;
     try {
       if (filledHearts[eventId]) {
-        // Unsave the event
         await deleteDoc(doc(db, "saveEvents", compositeId));
       } else {
-        // Save the event with minimal fields (userId, eventId)
         await setDoc(doc(db, "saveEvents", compositeId), {
           userId,
           eventId,
@@ -126,12 +123,12 @@ const EventList = ({ events: initialEvents = [], isGridView = false }) => {
         >
           {events.map((event, index) => (
             <motion.div
+              key={event.id}
               className={
                 isGridView
                   ? "col-md-4 mb-4"
                   : "list-group-item d-flex align-items-center mb-3 p-3 border rounded shadow-sm"
               }
-              key={event.id}
               initial={{ opacity: 0, y: 50 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -50 }}
@@ -166,11 +163,7 @@ const EventList = ({ events: initialEvents = [], isGridView = false }) => {
                   <h5 className="card-title">{event.Cime}</h5>
                   <p className="card-text">
                     Dátum:{" "}
-                    {new Date(
-                      event.Datum?.seconds
-                        ? event.Datum.seconds * 1000
-                        : event.Datum
-                    ).toLocaleString()}
+                    {new Date(event.Datum).toLocaleString()}
                   </p>
                   <p className="card-text">Helyszín: {event.Helyszin}</p>
                   <motion.button
@@ -222,11 +215,7 @@ const EventList = ({ events: initialEvents = [], isGridView = false }) => {
               )}
               <p>
                 <strong>Dátum:</strong>{" "}
-                {new Date(
-                  selectedEvent.Datum?.seconds
-                    ? selectedEvent.Datum.seconds * 1000
-                    : selectedEvent.Datum
-                ).toLocaleString()}
+                {new Date(selectedEvent.Datum).toLocaleString()}
               </p>
               <p>
                 <strong>Helyszín:</strong> {selectedEvent.Helyszin}

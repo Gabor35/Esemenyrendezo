@@ -43,14 +43,14 @@ const AppContent = () => {
   const [isGridView, setIsGridView] = useState(true);
   const [loading, setLoading] = useState(true);
 
-  // Check if user is logged in from localStorage
+  // Check for a logged in user from localStorage
   useEffect(() => {
     const storedUser = JSON.parse(localStorage.getItem("felhasz"));
     if (storedUser) {
       setUser(storedUser);
     }
-
-    // Fetch events from Firestore instead of an API; we’ll filter them client side
+   
+    // Fetch events from Firestore; the events are stored as strings
     const fetchEvents = async () => {
       try {
         const q = query(collection(db, "events"), orderBy("Datum", "desc"));
@@ -66,7 +66,7 @@ const AppContent = () => {
         setLoading(false);
       }
     };
-
+   
     fetchEvents();
     setupAxiosDefaults();
   }, []);
@@ -74,39 +74,31 @@ const AppContent = () => {
   const handleAddEvent = (newEvent) => {
     setEvents((prevEvents) => {
       const updatedEvents = [...prevEvents, newEvent];
-      // Sort events by date (handle both Firestore timestamps and Date strings)
+      // Sort events by comparing their date strings (assumes format "YYYY-MM-DDTHH:mm...")
       updatedEvents.sort((a, b) => {
-        const dateA = a.Datum?.seconds ? new Date(a.Datum.seconds * 1000) : new Date(a.Datum);
-        const dateB = b.Datum?.seconds ? new Date(b.Datum.seconds * 1000) : new Date(b.Datum);
-        return dateA - dateB;
+        // Here we simply compare the strings; if your date format changes, you might need to adjust this logic.
+        return a.Datum.localeCompare(b.Datum);
       });
       return updatedEvents;
     });
     setIsModalOpen(false);
   };
 
-  // Client‑side filtering logic; all filter criteria are applied to the events already fetched
+  // Client‑side filtering logic. We assume:
+  // - The "Datum" field is a string in ISO‑format (e.g., "2025-04-15T14:30:00Z").
+  // - The date input returns a string "YYYY-MM-DD".
+  // - The time input returns a string "HH:mm".
   const filteredEvents = events.filter((event) => {
-    const eventDate = event.Datum?.seconds
-      ? new Date(event.Datum.seconds * 1000)
-      : new Date(event.Datum);
-
-    // Date filtering – compare only the date part
-    const isDateMatch = filterDate
-      ? eventDate.toLocaleDateString() === new Date(filterDate).toLocaleDateString()
-      : true;
-
-    // Time filtering – check if event time string includes the filter value
-    const isTimeMatch = filterTime
-      ? eventDate.toLocaleTimeString().includes(filterTime)
-      : true;
-
-    // Location filtering – using "Helyszin" in Firestore (case insensitive)
+    const datum = event.Datum || "";
+    // Date filtering: compare first 10 characters (YYYY-MM-DD)
+    const isDateMatch = filterDate ? datum.slice(0, 10) === filterDate : true;
+    // Time filtering: compare substring (characters 11-16 assuming "T" as separator)
+    const isTimeMatch = filterTime ? datum.slice(11, 16).includes(filterTime) : true;
+    // Location filtering – case insensitive
     const isLocationMatch = filterLocation
       ? event.Helyszin?.toLowerCase().includes(filterLocation.toLowerCase())
       : true;
-
-    // Name filtering – using "Cime" in Firestore (case insensitive)
+    // Name filtering – case insensitive
     const isNameMatch = filterName
       ? event.Cime?.toLowerCase().includes(filterName.toLowerCase())
       : true;
@@ -158,7 +150,9 @@ const AppContent = () => {
                           border: "none",
                           color: "black",
                         }}
-                        className={({ isActive }) => "nav-link" + (isActive ? " active" : "")}
+                        className={({ isActive }) =>
+                          "nav-link" + (isActive ? " active" : "")
+                        }
                       >
                         Eseményrendező
                       </NavLink>
@@ -187,7 +181,9 @@ const AppContent = () => {
                               border: "none",
                               color: "black",
                             }}
-                            className={({ isActive }) => "nav-link" + (isActive ? " active" : "")}
+                            className={({ isActive }) =>
+                              "nav-link" + (isActive ? " active" : "")
+                            }
                           >
                             Rólunk
                           </NavLink>
@@ -248,7 +244,9 @@ const AppContent = () => {
                   <li className="nav-item">
                     <NavLink
                       to="/login"
-                      className={({ isActive }) => "nav-link" + (isActive ? " active" : "")}
+                      className={({ isActive }) =>
+                        "nav-link" + (isActive ? " active" : "")
+                      }
                     >
                       <span className="btn btn-light">Bejelentkezés</span>
                     </NavLink>
@@ -256,7 +254,9 @@ const AppContent = () => {
                   <li className="nav-item">
                     <NavLink
                       to="/register"
-                      className={({ isActive }) => "nav-link" + (isActive ? " active" : "")}
+                      className={({ isActive }) =>
+                        "nav-link" + (isActive ? " active" : "")
+                      }
                     >
                       <span className="btn btn-light">Regisztráció</span>
                     </NavLink>
@@ -360,7 +360,7 @@ const AppContent = () => {
                     />
                   </div>
 
-                  {/* Clear filter button */}
+                  {/* Clear Filters Button */}
                   <motion.button
                     className="btn btn-secondary"
                     onClick={() => {
@@ -398,7 +398,7 @@ const AppContent = () => {
         </Routes>
       </div>
 
-      {/* Modal for adding a new event */}
+      {/* Modal window for adding a new event */}
       {isModalOpen && (
         <div className="modal show" tabIndex="-1" style={{ display: "block" }}>
           <div className="modal-dialog">
