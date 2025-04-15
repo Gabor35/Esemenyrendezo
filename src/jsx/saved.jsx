@@ -1,13 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { Modal } from 'react-bootstrap';
 import { motion } from 'framer-motion';
-import { collection, getDocs, query, where, deleteDoc, doc } from 'firebase/firestore';
+import { collection, getDocs, query, where, deleteDoc, doc, getDoc } from 'firebase/firestore';
 import { db } from './firebase2';
 import heartFillIcon from '../pictures/heart-fill.svg';
 import { useGlobalContext } from '../Context/GlobalContext';
 
 const Saved = () => {
-  const [allEvents, setAllEvents] = useState([]);
   const [savedEvents, setSavedEvents] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -17,26 +16,8 @@ const Saved = () => {
 
   // Get user data from localStorage
   const userData = JSON.parse(localStorage.getItem('felhasz'));
-  console.log("User data:", userData);
 
-  // First, fetch all events from the "events" collection.
-  useEffect(() => {
-    const fetchAllEvents = async () => {
-      try {
-        const eventsSnapshot = await getDocs(query(collection(db, 'events')));
-        const eventsData = eventsSnapshot.docs.map(docSnap => ({
-          id: docSnap.id,
-          ...docSnap.data()
-        }));
-        setAllEvents(eventsData);
-      } catch (err) {
-        console.error("Error fetching all events:", err);
-      }
-    };
-    fetchAllEvents();
-  }, []);
-
-  // Then, fetch saved event IDs and filter the full events list.
+  // Fetch saved events in a single operation
   useEffect(() => {
     const fetchSavedEvents = async () => {
       setLoading(true);
@@ -49,19 +30,39 @@ const Saved = () => {
       }
 
       try {
-        // Query saveEvents documents for the current user.
+        // Query saveEvents documents for the current user
         const savesQuery = query(
           collection(db, "saveEvents"),
           where("userId", "==", userData.name)
         );
         const savesSnapshot = await getDocs(savesQuery);
-        const savedIds = savesSnapshot.docs.map(docSnap => docSnap.data().eventId.toString());
-        console.log("Saved event IDs:", savedIds);
+       
+        if (savesSnapshot.empty) {
+          setSavedEvents([]);
+          setLoading(false);
+          return;
+        }
 
-        // Filter allEvents to only include those that are saved.
-        const filtered = allEvents.filter(ev => savedIds.includes(ev.id));
-        console.log("Filtered saved events:", filtered);
-        setSavedEvents(filtered);
+        // Get the event details for each saved event ID
+        const eventPromises = savesSnapshot.docs.map(async (docSnap) => {
+          const eventId = docSnap.data().eventId;
+          const eventDocRef = doc(db, "events", eventId);
+          const eventDoc = await getDoc(eventDocRef);
+         
+          if (eventDoc.exists()) {
+            return {
+              id: eventDoc.id,
+              ...eventDoc.data()
+            };
+          }
+          return null;
+        });
+
+        const eventsData = await Promise.all(eventPromises);
+        // Filter out any null values (events that might have been deleted)
+        const validEvents = eventsData.filter(event => event !== null);
+       
+        setSavedEvents(validEvents);
       } catch (err) {
         console.error("Error fetching saved events:", err);
         setError("Nem sikerült lekérni a mentett eseményeket: " + err.message);
@@ -70,25 +71,26 @@ const Saved = () => {
       }
     };
 
-    // Run the saved events query whenever the list of all events is updated.
     fetchSavedEvents();
-  }, [userData, allEvents]);
+  }, [userData]);
 
-  // Show modal with event details.
+  // Show modal with event details
   const handleShowDetails = (event) => {
     setSelectedEvent(event);
     setShowModal(true);
   };
 
-  // Remove the saved event by deleting its document from the "saveEvents" collection.
+  // Remove the saved event
   const handleUnsaveEvent = async (eventId, e) => {
     e.preventDefault();
     if (!userData) {
       setError('Be kell jelentkezned az esemény eltávolításához');
       return;
     }
+   
     // Document ID format: userName_eventId
     const compositeId = `${userData.name}_${eventId}`;
+   
     try {
       await deleteDoc(doc(db, "saveEvents", compositeId));
       setSavedEvents(prev => prev.filter(ev => ev.id !== eventId));
