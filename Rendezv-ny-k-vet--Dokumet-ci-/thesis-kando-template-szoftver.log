@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.25 (MiKTeX 24.1) (preloaded format=pdflatex 2025.3.13)  15 APR 2025 11:00
+This is pdfTeX, Version 3.141592653-2.6-1.40.25 (MiKTeX 24.1) (preloaded format=pdflatex 2025.3.13)  15 APR 2025 13:09
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -1209,7 +1209,7 @@ LaTeX Info: Redefining \mit on input line 578.
 
 pdfTeX warning: pdflatex.exe (file ./kando-logo-hu.pdf): PDF inclusion: found P
 DF version <1.7>, but at most version <1.5> allowed
-<kando-logo-hu.pdf, id=102, 213.4374pt x 199.22429pt>
+<kando-logo-hu.pdf, id=134, 213.4374pt x 199.22429pt>
 File: kando-logo-hu.pdf Graphic file (type pdf)
 <use kando-logo-hu.pdf>
 Package pdftex.def Info: kando-logo-hu.pdf  used on input line 77.
@@ -1217,7 +1217,7 @@ Package pdftex.def Info: kando-logo-hu.pdf  used on input line 77.
 
 Class thesis-kando Warning: institute is missing on input line 77.
 
-<logo.jpg, id=103, 445.665pt x 449.68pt>
+<logo.jpg, id=135, 445.665pt x 449.68pt>
 File: logo.jpg Graphic file (type jpg)
 <use logo.jpg>
 Package pdftex.def Info: logo.jpg  used on input line 77.
@@ -1227,19 +1227,19 @@ Package pdftex.def Info: logo.jpg  used on input line 77.
 
 {C:/Users/Vizsga/AppData/Local/MiKTeX/fonts/map/pdftex/pdftex.map}{C:/Users/Viz
 sga/AppData/Local/Programs/MiKTeX/fonts/enc/dvips/lm/lm-ec.enc} <./kando-logo-h
-u.pdf> <./logo.jpg>] (thesis-kando-template-szoftver.toc)
+u.pdf> <./logo.jpg>] (thesis-kando-template-szoftver.toc [2
+
+])
 \tf@toc=\write7
 \openout7 = `thesis-kando-template-szoftver.toc'.
 
- [2
-
-] [3
+ [3] [4
 
 ]
 1. fejezet.
-[4
+[5
 
-] [5] [6]
+] [6] [7]
 LaTeX Font Info:    Trying to load font information for T1+lmtt on input line 1
 64.
 
@@ -1254,8 +1254,8 @@ LaTeX Font Info:    Trying to load font information for TS1+lmtt on input line
 (C:\Users\Vizsga\AppData\Local\Programs\MiKTeX\tex/latex/lm\ts1lmtt.fd
 File: ts1lmtt.fd 2015/05/01 v1.6.1 Font defs for Latin Modern
 )
-[7{C:/Users/Vizsga/AppData/Local/Programs/MiKTeX/fonts/enc/dvips/lm/lm-ts1.enc}
-] [8] [9] [10]
+[8{C:/Users/Vizsga/AppData/Local/Programs/MiKTeX/fonts/enc/dvips/lm/lm-ts1.enc}
+] [9] [10] [11]
 
 ! LaTeX Error: Invalid UTF-8 byte sequence (Ã\expandafter).
 
@@ -1286,7 +1286,7 @@ or specify an encoding such as \usepackage [latin1]{inputenc}
 in the document preamble.
 Alternatively, save the file in UTF-8 using your editor or another tool
 
-[11] [12]
+[12] [13]
 Overfull \hbox (98.1823pt too wide) in paragraph at lines 425--426
 \T1/lmr/m/n/12 az API vég-pon-tok-hoz. A Swag-ger UI el-ér-he-t® lesz a kö-vet-
 ke-z® URL-en: https://localhost:<port>/swagger.
@@ -1298,110 +1298,145 @@ Overfull \hbox (68.80154pt too wide) in paragraph at lines 433--434
 tp://localhost:5000/api/products). 
  []
 
-[13] [14] [15] [16] [17]
+[14] [15] [16] [17] [18]
 2. fejezet.
-[18
+[19
 
-] [19] [20]
-Underfull \hbox (badness 10000) in paragraph at lines 606--608
+] [20] [21]
+(C:\Users\Vizsga\AppData\Local\Programs\MiKTeX\tex/latex/listings\lstlang1.sty
+File: lstlang1.sty 2023/02/27 1.9 listings language file
+) (C:\Users\Vizsga\AppData\Local\Programs\MiKTeX\tex/latex/listings\lstlang2.st
+y
+File: lstlang2.sty 2023/02/27 1.9 listings language file
+)
+(C:\Users\Vizsga\AppData\Local\Programs\MiKTeX\tex/latex/listings\lstlang3.sty
+File: lstlang3.sty 2023/02/27 1.9 listings language file
+)
+
+! Package Listings Error: Couldn't load requested language.
+
+See the Listings package documentation for explanation.
+Type  H <return>  for immediate help.
+ ...                                              
+                                                  
+l.693  \begin{lstlisting}[language=csharp]
+                                          
+The following languages weren't loadable:
+    ,csharp$
+This may cause errors in the sequel.
+
+
+! Package Listings Error: language csharp undefined.
+
+See the Listings package documentation for explanation.
+Type  H <return>  for immediate help.
+ ...                                              
+                                                  
+l.693  \begin{lstlisting}[language=csharp]
+                                          
+The language is not loadable. Try typing  <return>  to proceed.
+If that doesn't work, type  X <return>  to quit.
+
+[22] [23] [24]
+Underfull \hbox (badness 10000) in paragraph at lines 781--783
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 606--608
+Underfull \hbox (badness 10000) in paragraph at lines 781--783
 
  []
 
-[21
+[25
 
 ]
-Underfull \hbox (badness 10000) in paragraph at lines 614--615
+Underfull \hbox (badness 10000) in paragraph at lines 789--790
 []\T1/lmr/m/sc/12 internetes for-rás\T1/lmr/m/n/12 : \T1/lmr/m/it/12 Mi az a re
 -lá-ci-ós adat-bá-zis?\T1/lmr/m/n/12 , [][]$\T1/lmtt/m/n/12 https : / / azure .
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 614--615
+Underfull \hbox (badness 10000) in paragraph at lines 789--790
 \T1/lmtt/m/n/12 microsoft . com / hu-[]hu / resources / cloud-[]computing-[]dic
 tionary /
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 616--617
+Underfull \hbox (badness 10000) in paragraph at lines 791--792
 \T1/lmr/m/it/12 Co-re\T1/lmr/m/n/12 , [][]$\T1/lmtt/m/n/12 https : / / learn . 
 microsoft . com / en-[]us / aspnet / core / tutorials /
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 616--617
+Underfull \hbox (badness 10000) in paragraph at lines 791--792
 \T1/lmtt/m/n/12 first-[]web-[]api ? view = aspnetcore-[]9 . 0 & tabs = visual-[
 ]studio$[][]\T1/lmr/m/n/12 , Le-tölt-ve: 2025
  []
 
 
-Underfull \hbox (badness 4229) in paragraph at lines 618--619
+Underfull \hbox (badness 4229) in paragraph at lines 793--794
 []\T1/lmr/m/sc/12 internetes for-rás\T1/lmr/m/n/12 : \T1/lmr/m/it/12 Re-act (so
 ft-ware)\T1/lmr/m/n/12 , [][]$\T1/lmtt/m/n/12 https : / / en . wikipedia . org 
 / wiki /
  []
 
 
-Underfull \hbox (badness 8038) in paragraph at lines 620--621
+Underfull \hbox (badness 8038) in paragraph at lines 795--796
 []\T1/lmr/m/sc/12 internetes for-rás\T1/lmr/m/n/12 : \T1/lmr/m/it/12 Egy-sze-r¶
 , adat-ve-zé-relt CRUD-mikroszolgáltatás lét-
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 620--621
+Underfull \hbox (badness 10000) in paragraph at lines 795--796
 \T1/lmr/m/it/12 re-ho-zá-sa\T1/lmr/m/n/12 , [][]$\T1/lmtt/m/n/12 https : / / le
 arn . microsoft . com / hu-[]hu / dotnet / architecture /
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 620--621
+Underfull \hbox (badness 10000) in paragraph at lines 795--796
 \T1/lmtt/m/n/12 microservices / multi-[]container-[]microservice-[]net-[]applic
 ations /
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 622--623
+Underfull \hbox (badness 10000) in paragraph at lines 797--798
 []\T1/lmr/m/sc/12 internetes for-rás\T1/lmr/m/n/12 : \T1/lmr/m/it/12 Adat-bá-zi
 s ke-ze-lé-se En-tity Fra-
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 622--623
+Underfull \hbox (badness 10000) in paragraph at lines 797--798
 \T1/lmr/m/it/12 me-work se-gít-sé-gé-vel\T1/lmr/m/n/12 , [][]$\T1/lmtt/m/n/12 h
 ttps : / / csharptutorial . hu / docs /
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 622--623
+Underfull \hbox (badness 10000) in paragraph at lines 797--798
 \T1/lmtt/m/n/12 hellovilag-[]hellocsharp / 15-[]adatbazis-[]kezeles-[]entity-[]
 framework-[]el /
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 624--626
+Underfull \hbox (badness 10000) in paragraph at lines 799--801
 \T1/lmr/m/it/12 Co-re \T1/lmr/m/n/12 ,[][]$\T1/lmtt/m/n/12 https : / / learn . 
 microsoft . com / en-[]us / aspnet / core / tutorials /
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 624--626
+Underfull \hbox (badness 10000) in paragraph at lines 799--801
 \T1/lmtt/m/n/12 first-[]web-[]api ? view = aspnetcore-[]9 . 0 & tabs = visual-[
 ]studio$[][]\T1/lmr/m/n/12 ,Letöltve: 2025
  []
 
-<tabla.png, id=477, 404.51125pt x 624.3325pt>
+<tabla.png, id=565, 404.51125pt x 624.3325pt>
 File: tabla.png Graphic file (type png)
 <use tabla.png>
-Package pdftex.def Info: tabla.png  used on input line 633.
+Package pdftex.def Info: tabla.png  used on input line 808.
 (pdftex.def)             Requested size: 441.01773pt x 680.68996pt.
-[22
+[26
 
-] [23 <./tabla.png>] (thesis-kando-template-szoftver.aux)
+] [27 <./tabla.png>] (thesis-kando-template-szoftver.aux)
  ***********
 LaTeX2e <2023-11-01> patch level 1
 L3 programming layer <2024-01-04>
@@ -1415,29 +1450,61 @@ hanged.
 
 Package rerunfilecheck Info: Checksums for `thesis-kando-template-szoftver.out'
 :
-(rerunfilecheck)             Before: 1EE546CB3BA4D1F701E7B7342F7D4FCA;4261
-(rerunfilecheck)             After:  F91745BD5C1DEB3D6F08F861FC430711;4219.
+(rerunfilecheck)             Before: 963EBB1E92B852DDDDE9EAF7A917C189;5670
+(rerunfilecheck)             After:  1527CC9295F1A589247B9BC3C9281822;5552.
  ) 
 Here is how much of TeX's memory you used:
- 37055 strings out of 474486
- 785530 string characters out of 5743283
+ 37142 strings out of 474486
+ 787207 string characters out of 5743283
  2115542 words of memory out of 5000000
- 58499 multiletter control sequences out of 15000+600000
+ 58535 multiletter control sequences out of 15000+600000
  625017 words of font info for 91 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
  98i,7n,101p,1929b,2055s stack positions out of 10000i,1000n,20000p,200000b,200000s
-<C:/Users/Vizsga/AppData/Local/Programs/MiKTeX/fonts/type1/public/lm/lmbx12.p
-fb><C:/Users/Vizsga/AppData/Local/Programs/MiKTeX/fonts/type1/public/lm/lmcsc10
-.pfb><C:/Users/Vizsga/AppData/Local/Programs/MiKTeX/fonts/type1/public/lm/lmr12
-.pfb><C:/Users/Vizsga/AppData/Local/Programs/MiKTeX/fonts/type1/public/lm/lmr6.
-pfb><C:/Users/Vizsga/AppData/Local/Programs/MiKTeX/fonts/type1/public/lm/lmri12
-.pfb><C:/Users/Vizsga/AppData/Local/Programs/MiKTeX/fonts/type1/public/lm/lmtk1
-0.pfb><C:/Users/Vizsga/AppData/Local/Programs/MiKTeX/fonts/type1/public/lm/lmtt
-10.pfb><C:/Users/Vizsga/AppData/Local/Programs/MiKTeX/fonts/type1/public/lm/lmt
-t12.pfb>
-Output written on thesis-kando-template-szoftver.pdf (23 pages, 405083 bytes).
+
+pdfTeX warning (dest): name{subsection.2.4.5} has been referenced but does not 
+exist, replaced by a fixed one
+
+
+pdfTeX warning (dest): name{subsection.2.4.4} has been referenced but does not 
+exist, replaced by a fixed one
+
+
+pdfTeX warning (dest): name{subsection.2.4.3} has been referenced but does not 
+exist, replaced by a fixed one
+
+
+pdfTeX warning (dest): name{subsection.2.4.2} has been referenced but does not 
+exist, replaced by a fixed one
+
+
+pdfTeX warning (dest): name{subsection.2.4.1} has been referenced but does not 
+exist, replaced by a fixed one
+
+
+pdfTeX warning (dest): name{section.2.4} has been referenced but does not exist
+, replaced by a fixed one
+
+
+pdfTeX warning (dest): name{subsection.2.3.7} has been referenced but does not 
+exist, replaced by a fixed one
+
+
+pdfTeX warning (dest): name{subsection.2.3.6} has been referenced but does not 
+exist, replaced by a fixed one
+
+<C:/Users/Vizsga/AppData/Local/Programs/MiKTeX/fonts/type1/public/lm/lmbx12.pfb
+><C:/Users/Vizsga/AppData/Local/Programs/MiKTeX/fonts/type1/public/lm/lmcsc10.p
+fb><C:/Users/Vizsga/AppData/Local/Programs/MiKTeX/fonts/type1/public/lm/lmr12.p
+fb><C:/Users/Vizsga/AppData/Local/Programs/MiKTeX/fonts/type1/public/lm/lmr6.pf
+b><C:/Users/Vizsga/AppData/Local/Programs/MiKTeX/fonts/type1/public/lm/lmri12.p
+fb><C:/Users/Vizsga/AppData/Local/Programs/MiKTeX/fonts/type1/public/lm/lmtk10.
+pfb><C:/Users/Vizsga/AppData/Local/Programs/MiKTeX/fonts/type1/public/lm/lmtt10
+.pfb><C:/Users/Vizsga/AppData/Local/Programs/MiKTeX/fonts/type1/public/lm/lmtt1
+2.pfb>
+Output written on thesis-kando-template-szoftver.pdf (27 pages, 425470 bytes).
 PDF statistics:
- 594 PDF objects out of 1000 (max. 8388607)
- 280 named destinations out of 1000 (max. 500000)
- 220 words of extra memory for PDF output out of 10000 (max. 10000000)
+ 689 PDF objects out of 1000 (max. 8388607)
+ 322 named destinations out of 1000 (max. 500000)
+ 284 words of extra memory for PDF output out of 10000 (max. 10000000)
 

@@ -570,6 +570,181 @@ A rendszer ezen táblák segítségével hatékonyan képes kezelni a felhaszná
 
  \section{Backend}
  
+ A backend rendszer a .NET Core keretrendszerre épül, amely biztosítja a szükséges infrastruktúrát a webes API-k létrehozásához és az adatbázis-kezeléshez. Az alábbiakban részletesen bemutatjuk a backend komponenseit és működését.
+ 
+ \subsection{Kontrollerek}
+ 
+ A kontrollerek felelősek a HTTP kérések kezeléséért és a megfelelő válaszok visszaküldéséért. Az alkalmazás a következő fő kontrollereket tartalmazza:
+ 
+ \subsubsection{EsemenyController}
+ 
+ Az \texttt{EsemenyController} felelős az események kezeléséért:
+ 
+ \begin{itemize}
+ 	\item \textbf{GET /api/Esemeny}: Összes esemény lekérdezése
+ 	\item \textbf{GET /api/Esemeny/\{id\}}: Egy adott esemény lekérdezése azonosító alapján
+ 	\item \textbf{POST /api/Esemeny}: Új esemény létrehozása
+ 	\item \textbf{PUT /api/Esemeny/\{id\}}: Meglévő esemény frissítése
+ 	\item \textbf{DELETE /api/Esemeny/\{id\}}: Esemény törlése
+ \end{itemize}
+ 
+ Az eseményekhez kapcsolódó műveletek jogosultságkezelést tartalmaznak, bizonyos műveletek csak bejelentkezett felhasználók vagy adminisztrátorok számára érhetők el.
+ 
+ \subsubsection{FelhasznaloController}
+ 
+ A \texttt{FelhasznaloController} a felhasználói fiókokkal kapcsolatos műveleteket kezeli:
+ 
+ \begin{itemize}
+ 	\item \textbf{POST /api/Felhasznalo/register}: Felhasználói regisztráció
+ 	\item \textbf{POST /api/Felhasznalo/login}: Bejelentkezés
+ 	\item \textbf{POST /api/Felhasznalo/logout}: Kijelentkezés
+ 	\item \textbf{GET /api/Felhasznalo/profile}: Felhasználói profil lekérdezése
+ 	\item \textbf{PUT /api/Felhasznalo/profile}: Profil adatok frissítése
+ 	\item \textbf{POST /api/Felhasznalo/refresh-token}: Token frissítése
+ 	\item \textbf{POST /api/Felhasznalo/change-password}: Jelszó módosítása
+ \end{itemize}
+ 
+ A kontroller tartalmazza a szükséges biztonsági ellenőrzéseket, beleértve a jelszó validációt és a token kezelést.
+ 
+ \subsubsection{ReszvetelController}
+ 
+ A \texttt{ReszvetelController} az eseményeken való részvételt kezeli:
+ 
+ \begin{itemize}
+ 	\item \textbf{POST /api/Reszvetel}: Részvétel regisztrálása egy eseményre
+ 	\item \textbf{GET /api/Reszvetel/user/\{userId\}}: Felhasználó részvételeinek lekérdezése
+ 	\item \textbf{GET /api/Reszvetel/event/\{eventId\}}: Eseményen résztvevők lekérdezése
+ 	\item \textbf{DELETE /api/Reszvetel/\{id\}}: Részvétel törlése
+ \end{itemize}
+ 
+ \subsection{Szolgáltatások (Services)}
+ 
+ \subsubsection{TokenService}
+ 
+ A \texttt{TokenService} felelős a JWT tokenek kezeléséért:
+ 
+ \begin{itemize}
+ 	\item \textbf{GenerateAccessToken}: Hozzáférési token generálása
+ 	\item \textbf{GenerateRefreshToken}: Frissítési token generálása
+ 	\item \textbf{ValidateToken}: Token érvényességének ellenőrzése
+ 	\item \textbf{GetPrincipalFromExpiredToken}: Lejárt tokenből felhasználói adatok kinyerése
+ \end{itemize}
+ 
+ \subsubsection{EmailService}
+ 
+ Az \texttt{EmailService} az e-mail küldési funkcionalitást biztosítja:
+ 
+ \begin{itemize}
+ 	\item \textbf{SendRegistrationConfirmation}: Regisztrációs visszaigazolás küldése
+ 	\item \textbf{SendPasswordReset}: Jelszó-visszaállítási e-mail küldése
+ 	\item \textbf{SendEventNotification}: Esemény értesítések küldése
+ \end{itemize}
+ 
+ \subsection{Middleware-ek}
+ 
+ \subsubsection{AuthenticationMiddleware}
+ 
+ Az \texttt{AuthenticationMiddleware} minden kérés esetén ellenőrzi a felhasználó hitelesítését:
+ 
+ \begin{itemize}
+ 	\item JWT token validálása
+ 	\item Felhasználói jogosultságok ellenőrzése
+ 	\item Munkamenet kezelése
+ \end{itemize}
+ 
+ \subsubsection{ExceptionHandlingMiddleware}
+ 
+ Az \texttt{ExceptionHandlingMiddleware} a hibakezelésért felelős:
+ 
+ \begin{itemize}
+ 	\item Kivételek elfogása és naplózása
+ 	\item Megfelelő HTTP státuszkódok visszaadása
+ 	\item Hibaüzenetek formázása a kliensek számára
+ \end{itemize}
+ 
+ \subsection{Adatbázis Műveletek}
+ 
+ \subsubsection{Repository Pattern}
+ 
+ Az alkalmazás a Repository mintát használja az adatbázis-műveletek absztrahálására:
+ 
+ \begin{itemize}
+ 	\item \textbf{IEsemenyRepository}: Események CRUD műveletei
+ 	\item \textbf{IFelhasznaloRepository}: Felhasználók kezelése
+ 	\item \textbf{IReszvetelRepository}: Részvételek kezelése
+ \end{itemize}
+ 
+ \subsubsection{Entity Framework Core}
+ 
+ Az adatbázis-műveletek Entity Framework Core segítségével történnek:
+ 
+ \begin{itemize}
+ 	\item Code-First megközelítés
+ 	\item Migrációk kezelése
+ 	\item Kapcsolatok definiálása a modellek között
+ \end{itemize}
+ 
+ \subsection{API Biztonság}
+ 
+ \subsubsection{CORS Konfiguráció}
+ 
+ A Cross-Origin Resource Sharing (CORS) beállítások lehetővé teszik a frontend és backend közötti biztonságos kommunikációt:
+ 
+ \begin{lstlisting}[language=csharp]
+ 	services.AddCors(options =>
+ 	{
+ 		options.AddPolicy("AllowSpecificOrigin",
+ 		builder => builder
+ 		.WithOrigins("http://localhost:3000")
+ 		.AllowAnyMethod()
+ 		.AllowAnyHeader()
+ 		.AllowCredentials());
+ 	});
+ \end{lstlisting}
+ 
+ \subsubsection{Rate Limiting}
+ 
+ A túlzott API-hívások elleni védelem érdekében rate limiting van implementálva:
+ 
+ \begin{itemize}
+ 	\item IP-alapú korlátozások
+ 	\item Időablak-alapú korlátozások
+ 	\item Különböző korlátozások különböző végpontokra
+ \end{itemize}
+ 
+ \subsection{Naplózás}
+ 
+ A backend részletes naplózási rendszerrel rendelkezik:
+ 
+ \begin{itemize}
+ 	\item \textbf{Serilog} integrációja
+ 	\item Strukturált naplózás
+ 	\item Különböző naplózási szintek (Debug, Information, Warning, Error)
+ 	\item Naplófájlok rotációja
+ \end{itemize}
+ 
+ \subsection{Teljesítmény Optimalizáció}
+ 
+ \subsubsection{Gyorsítótárazás}
+ 
+ Az alkalmazás memória-gyorsítótárat használ a gyakran lekérdezett adatok gyorsabb elérése érdekében:
+ 
+ \begin{itemize}
+ 	\item Események listájának gyorsítótárazása
+ 	\item Felhasználói profilok gyorsítótárazása
+ 	\item Időalapú gyorsítótár-érvénytelenítés
+ \end{itemize}
+ 
+ \subsubsection{Aszinkron Műveletek}
+ 
+ A backend aszinkron műveleteket használ a skálázhatóság és teljesítmény érdekében:
+ 
+ \begin{itemize}
+ 	\item Aszinkron kontroller műveletek
+ 	\item Task-alapú adatbázis-műveletek
+ 	\item Nem blokkoló I/O műveletek
+ \end{itemize}
+ 
  \section{Frontend}
  \noindent 
  \textit{A frontend a React könyvtárral készült, amely egy modern JavaScript alapú keretrendszer az interaktív felhasználói felületek létrehozására. A komponensalapú felépítés lehetővé teszi a kód újrafelhasználását és jól strukturált alkalmazás készítését.}

@@ -1,24 +1,44 @@
-\select@language {magyar} \contentsline {chapter}{Bevezetés}{3}{chapter*.2}%
-\select@language {magyar} \contentsline {chapter}{\numberline {1}Technológiai háttér}{4}{chapter.1}%
-\select@language {magyar} \contentsline {section}{\numberline {1.1}Relációs Adatbáziskezelő Rendszerek}{4}{section.1.1}%
-\select@language {magyar} \contentsline {section}{\numberline {1.2}.NET Web API}{6}{section.1.2}%
-\select@language {magyar} \contentsline {section}{\numberline {1.3}A React Programozás Alapjai és Fejlettebb Fogalmai}{6}{section.1.3}%
-\select@language {magyar} \contentsline {section}{\numberline {1.4}CRUD Műveletek}{10}{section.1.4}%
-\select@language {magyar} \contentsline {section}{\numberline {1.5}Entity Framework (EF) - Adatbázis kezelés}{14}{section.1.5}%
-\select@language {magyar} \contentsline {section}{\numberline {1.6}Web API - Backend kommunikáció}{15}{section.1.6}%
-\select@language {magyar} \contentsline {section}{\numberline {1.7}React - Frontend}{16}{section.1.7}%
-\select@language {magyar} \contentsline {section}{\numberline {1.8}Integráció - React és Web API}{17}{section.1.8}%
-\select@language {magyar} \contentsline {chapter}{\numberline {2}Program}{18}{chapter.2}%
-\select@language {magyar} \contentsline {section}{\numberline {2.1}Adatbázis}{18}{section.2.1}%
-\select@language {magyar} \contentsline {subsection}{\numberline {2.1.1}Felhasználó}{18}{subsection.2.1.1}%
-\select@language {magyar} \contentsline {subsection}{\numberline {2.1.2}Esemény}{18}{subsection.2.1.2}%
-\select@language {magyar} \contentsline {subsection}{\numberline {2.1.3}Chat üzenetek}{18}{subsection.2.1.3}%
-\select@language {magyar} \contentsline {section}{\numberline {2.2}Backend}{19}{section.2.2}%
-\select@language {magyar} \contentsline {section}{\numberline {2.3}Frontend}{19}{section.2.3}%
-\select@language {magyar} \contentsline {subsection}{\numberline {2.3.1}Eseményrendező program bemutatása}{19}{subsection.2.3.1}%
-\select@language {magyar} \contentsline {subsection}{\numberline {2.3.2}Login.jsx}{19}{subsection.2.3.2}%
-\select@language {magyar} \contentsline {subsection}{\numberline {2.3.3}Register.jsx}{19}{subsection.2.3.3}%
-\select@language {magyar} \contentsline {subsection}{\numberline {2.3.4}Chat.jsx}{19}{subsection.2.3.4}%
-\select@language {magyar} \contentsline {subsection}{\numberline {2.3.5}Aboutus.jsx}{20}{subsection.2.3.5}%
-\select@language {magyar} \contentsline {chapter}{Összegzés}{21}{chapter*.3}%
-\select@language {magyar} \contentsline {chapter}{Irodalomjegyz\'ek}{22}{chapter*.4}%
+\select@language {magyar} \contentsline {chapter}{Bevezetés}{4}{chapter*.2}%
+\select@language {magyar} \contentsline {chapter}{\numberline {1}Technológiai háttér}{5}{chapter.1}%
+\select@language {magyar} \contentsline {section}{\numberline {1.1}Relációs Adatbáziskezelő Rendszerek}{5}{section.1.1}%
+\select@language {magyar} \contentsline {section}{\numberline {1.2}.NET Web API}{7}{section.1.2}%
+\select@language {magyar} \contentsline {section}{\numberline {1.3}A React Programozás Alapjai és Fejlettebb Fogalmai}{7}{section.1.3}%
+\select@language {magyar} \contentsline {section}{\numberline {1.4}CRUD Műveletek}{11}{section.1.4}%
+\select@language {magyar} \contentsline {section}{\numberline {1.5}Entity Framework (EF) - Adatbázis kezelés}{15}{section.1.5}%
+\select@language {magyar} \contentsline {section}{\numberline {1.6}Web API - Backend kommunikáció}{16}{section.1.6}%
+\select@language {magyar} \contentsline {section}{\numberline {1.7}React - Frontend}{17}{section.1.7}%
+\select@language {magyar} \contentsline {section}{\numberline {1.8}Integráció - React és Web API}{18}{section.1.8}%
+\select@language {magyar} \contentsline {chapter}{\numberline {2}Program}{19}{chapter.2}%
+\select@language {magyar} \contentsline {section}{\numberline {2.1}Adatbázis}{19}{section.2.1}%
+\select@language {magyar} \contentsline {subsection}{\numberline {2.1.1}Felhasználó}{19}{subsection.2.1.1}%
+\select@language {magyar} \contentsline {subsection}{\numberline {2.1.2}Esemény}{19}{subsection.2.1.2}%
+\select@language {magyar} \contentsline {subsection}{\numberline {2.1.3}Chat üzenetek}{19}{subsection.2.1.3}%
+\select@language {magyar} \contentsline {section}{\numberline {2.2}Backend}{20}{section.2.2}%
+\select@language {magyar} \contentsline {subsection}{\numberline {2.2.1}Kontrollerek}{20}{subsection.2.2.1}%
+\select@language {magyar} \contentsline {subsubsection}{EsemenyController}{20}{section*.3}%
+\select@language {magyar} \contentsline {subsubsection}{FelhasznaloController}{20}{section*.4}%
+\select@language {magyar} \contentsline {subsubsection}{ReszvetelController}{21}{section*.5}%
+\select@language {magyar} \contentsline {subsection}{\numberline {2.2.2}Szolgáltatások (Services)}{21}{subsection.2.2.2}%
+\select@language {magyar} \contentsline {subsubsection}{TokenService}{21}{section*.6}%
+\select@language {magyar} \contentsline {subsubsection}{EmailService}{21}{section*.7}%
+\select@language {magyar} \contentsline {subsection}{\numberline {2.2.3}Middleware-ek}{21}{subsection.2.2.3}%
+\select@language {magyar} \contentsline {subsubsection}{AuthenticationMiddleware}{21}{section*.8}%
+\select@language {magyar} \contentsline {subsubsection}{ExceptionHandlingMiddleware}{22}{section*.9}%
+\select@language {magyar} \contentsline {subsection}{\numberline {2.2.4}Adatbázis Műveletek}{22}{subsection.2.2.4}%
+\select@language {magyar} \contentsline {subsubsection}{Repository Pattern}{22}{section*.10}%
+\select@language {magyar} \contentsline {subsubsection}{Entity Framework Core}{22}{section*.11}%
+\select@language {magyar} \contentsline {subsection}{\numberline {2.2.5}API Biztonság}{22}{subsection.2.2.5}%
+\select@language {magyar} \contentsline {subsubsection}{CORS Konfiguráció}{22}{section*.12}%
+\select@language {magyar} \contentsline {subsubsection}{Rate Limiting}{23}{section*.13}%
+\select@language {magyar} \contentsline {subsection}{\numberline {2.2.6}Naplózás}{23}{subsection.2.2.6}%
+\select@language {magyar} \contentsline {subsection}{\numberline {2.2.7}Teljesítmény Optimalizáció}{23}{subsection.2.2.7}%
+\select@language {magyar} \contentsline {subsubsection}{Gyorsítótárazás}{23}{section*.14}%
+\select@language {magyar} \contentsline {subsubsection}{Aszinkron Műveletek}{23}{section*.15}%
+\select@language {magyar} \contentsline {section}{\numberline {2.3}Frontend}{24}{section.2.3}%
+\select@language {magyar} \contentsline {subsection}{\numberline {2.3.1}Eseményrendező program bemutatása}{24}{subsection.2.3.1}%
+\select@language {magyar} \contentsline {subsection}{\numberline {2.3.2}Login.jsx}{24}{subsection.2.3.2}%
+\select@language {magyar} \contentsline {subsection}{\numberline {2.3.3}Register.jsx}{24}{subsection.2.3.3}%
+\select@language {magyar} \contentsline {subsection}{\numberline {2.3.4}Chat.jsx}{24}{subsection.2.3.4}%
+\select@language {magyar} \contentsline {subsection}{\numberline {2.3.5}Aboutus.jsx}{24}{subsection.2.3.5}%
+\select@language {magyar} \contentsline {chapter}{Összegzés}{25}{chapter*.16}%
+\select@language {magyar} \contentsline {chapter}{Irodalomjegyz\'ek}{26}{chapter*.17}%
