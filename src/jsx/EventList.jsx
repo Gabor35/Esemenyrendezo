@@ -1,8 +1,16 @@
 import React, { useState, useEffect } from 'react';
-import { collection, getDocs, query, orderBy } from 'firebase/firestore';
+import {
+  collection,
+  getDocs,
+  query,
+  orderBy,
+  where,
+  doc,
+  setDoc,
+  deleteDoc
+} from 'firebase/firestore';
 import { db } from './firebase2';
 import { Modal } from 'react-bootstrap';
-import axios from 'axios';
 import { motion, AnimatePresence } from 'framer-motion';
 import heartIcon from '../pictures/heart.svg';
 import heartFillIcon from '../pictures/heart-fill.svg';
@@ -17,17 +25,18 @@ const EventList = ({ isGridView = false }) => {
   const [error, setError] = useState('');
   const { apiUrl } = useGlobalContext();
 
+  // Get user data from localStorage
   const userData = JSON.parse(localStorage.getItem('felhasz'));
-  const token = userData ? userData.token : null;
 
+  // Fetch events from Firestore "events" collection
   useEffect(() => {
     const fetchEvents = async () => {
       try {
         const q = query(collection(db, 'events'), orderBy('Datum', 'desc'));
         const querySnapshot = await getDocs(q);
-        const eventsData = querySnapshot.docs.map(doc => ({
-          id: doc.id,
-          ...doc.data()
+        const eventsData = querySnapshot.docs.map(docSnap => ({
+          id: docSnap.id,
+          ...docSnap.data()
         }));
         setEvents(eventsData);
         setLoading(false);
@@ -41,47 +50,58 @@ const EventList = ({ isGridView = false }) => {
     fetchEvents();
   }, []);
 
+  // Check saved events for the current user from Firestore "saveEvents" collection
   useEffect(() => {
-    const checkSavedEvents = async () => {
-      if (!token || !events.length) return;
-
+    const fetchSavedStatus = async () => {
+      if (!userData || !events.length) return;
       try {
-        const savedHearts = {};
-        for (const event of events) {
-          if (!event.id) continue;
-          const response = await axios.get(`${apiUrl}Reszvetel/check/${token}/${event.id}`);
-          savedHearts[event.id] = response.data;
-        }
-        setFilledHearts(savedHearts);
-      } catch (error) {
-        console.error('Error checking saved events:', error);
+        // Pull all savedEvents docs for this user
+        const q = query(
+          collection(db, 'saveEvents'),
+          where('userId', '==', userData.name)
+        );
+        const querySnapshot = await getDocs(q);
+
+        // Build a map of eventId -> true for quick lookup
+        const savedHeartsData = {};
+        querySnapshot.forEach(docSnap => {
+          const { eventId } = docSnap.data();
+          savedHeartsData[eventId] = true;
+        });
+        setFilledHearts(savedHeartsData);
+      } catch (err) {
+        console.error('Error checking saved events:', err);
       }
     };
+    fetchSavedStatus();
+  }, [events, userData]);
 
-    checkSavedEvents();
-  }, [events, token, apiUrl]);
-
+  // Save/Unsave event using Firestore in the "saveEvents" collection.
   const handleHeartClick = async (eventId, e) => {
     e.preventDefault();
-    if (!token) {
+    if (!userData) {
       alert('Be kell jelentkezned az esemény mentéséhez');
       return;
     }
+    const userId = userData.name;
+    // Document ID: userId_eventId
+    const compositeId = `${userId}_${eventId}`;
     try {
       if (filledHearts[eventId]) {
-        await axios.delete(`${apiUrl}Reszvetel/${token}/${eventId}`);
+        // Unsave: delete from Firestore
+        await deleteDoc(doc(db, "saveEvents", compositeId));
       } else {
-        // ✅ FIXED: add empty body as second parameter
-        await axios.post(`${apiUrl}Reszvetel/${token}/${eventId}`, {});
-        console.log('Esemény mentve:', token);
-        console.log('Esemény mentve:', eventId);
+        // Save only userId & eventId
+        await setDoc(doc(db, "saveEvents", compositeId), {
+          userId,
+          eventId
+        });
       }
       setFilledHearts(prev => ({ ...prev, [eventId]: !prev[eventId] }));
     } catch (error) {
-      alert('Hiba: ' + (error.response?.data || error.message));
+      alert('Hiba: ' + error.message);
     }
   };
-  
 
   const handleShowDetails = (event) => {
     setSelectedEvent(event);
@@ -104,25 +124,41 @@ const EventList = ({ isGridView = false }) => {
         >
           {events.map((event, index) => (
             <motion.div
-              className={isGridView ? "col-md-4 mb-4" : "list-group-item d-flex align-items-center mb-3 p-3 border rounded shadow-sm"}
+              className={
+                isGridView
+                  ? "col-md-4 mb-4"
+                  : "list-group-item d-flex align-items-center mb-3 p-3 border rounded shadow-sm"
+              }
               key={event.id}
               initial={{ opacity: 0, y: 50 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -50 }}
               transition={{ delay: index * 0.1, duration: 0.5 }}
             >
-              <div className="card mb-3" style={isGridView ? {} : { display: 'flex', flexDirection: 'row', width: '100%' }}>
+              <div
+                className="card mb-3"
+                style={isGridView ? {} : { display: 'flex', flexDirection: 'row', width: '100%' }}
+              >
                 {event.Kepurl && (
                   <img
                     src={event.Kepurl}
                     className={isGridView ? "card-img-top" : "img-thumbnail"}
                     alt={event.Cime}
-                    style={isGridView ? { height: '200px', objectFit: 'cover' } : { maxWidth: '200px', maxHeight: '200px', objectFit: 'cover', marginRight: '15px' }}
+                    style={
+                      isGridView
+                        ? { height: '200px', objectFit: 'cover' }
+                        : { maxWidth: '200px', maxHeight: '200px', objectFit: 'cover', marginRight: '15px' }
+                    }
                   />
                 )}
                 <div className="card-body" style={isGridView ? {} : { flex: 1 }}>
                   <h5 className="card-title">{event.Cime}</h5>
-                  <p className="card-text">Dátum: {new Date(event.Datum?.seconds ? event.Datum.seconds * 1000 : event.Datum).toLocaleString()}</p>
+                  <p className="card-text">
+                    Dátum:{' '}
+                    {new Date(
+                      event.Datum?.seconds ? event.Datum.seconds * 1000 : event.Datum
+                    ).toLocaleString()}
+                  </p>
                   <p className="card-text">Helyszín: {event.Helyszin}</p>
                   <motion.button
                     className="btn btn-secondary"
@@ -133,7 +169,13 @@ const EventList = ({ isGridView = false }) => {
                     Részletek
                   </motion.button>
                   <button
-                    style={{ background: 'none', border: 'none', cursor: 'pointer', padding: '5px', marginLeft: '10px' }}
+                    style={{
+                      background: 'none',
+                      border: 'none',
+                      cursor: 'pointer',
+                      padding: '5px',
+                      marginLeft: '10px'
+                    }}
                     onClick={(e) => handleHeartClick(event.id, e)}
                   >
                     <motion.img
@@ -165,9 +207,20 @@ const EventList = ({ isGridView = false }) => {
                   style={{ width: '100%', objectFit: 'cover' }}
                 />
               )}
-              <p><strong>Dátum:</strong> {new Date(selectedEvent.Datum?.seconds ? selectedEvent.Datum.seconds * 1000 : selectedEvent.Datum).toLocaleString()}</p>
-              <p><strong>Helyszín:</strong> {selectedEvent.Helyszin}</p>
-              <p><strong>Leírás:</strong> {selectedEvent.Leiras}</p>
+              <p>
+                <strong>Dátum:</strong>{' '}
+                {new Date(
+                  selectedEvent.Datum?.seconds
+                    ? selectedEvent.Datum.seconds * 1000
+                    : selectedEvent.Datum
+                ).toLocaleString()}
+              </p>
+              <p>
+                <strong>Helyszín:</strong> {selectedEvent.Helyszin}
+              </p>
+              <p>
+                <strong>Leírás:</strong> {selectedEvent.Leiras}
+              </p>
             </>
           )}
         </Modal.Body>
