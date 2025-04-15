@@ -20,9 +20,8 @@ import Aboutus from "./aboutus";
 import gear from "../pictures/gear-fill.svg";
 import gridIcon from "../pictures/grid.svg";
 import listIcon from "../pictures/card-list.svg";
-
-
-//https://www.booking.com/searchresults.hu.html?label=msn-tUXtx_K*PI_SVt3q3YLZDg-79989658705990%3Atikwd-79989834340534%3Aloc-88%3Aneo%3Amte%3Alp141771%3Adec%3Aqshotel+oldalak&utm_source=bing&utm_medium=cpc&utm_term=tUXtx_K*PI_SVt3q3YLZDg&utm_content=Booking+-+Desktop&utm_campaign=Hungarian_Hungary+HU+HU&aid=2369666&dest_id=-553173&dest_type=city&group_adults=2&req_adults=2&no_rooms=1&group_children=0&req_children=0
+import { collection, getDocs, query, orderBy } from 'firebase/firestore';
+import { db } from './firebase2';
 
 const setupAxiosDefaults = () => {
   const userData = JSON.parse(localStorage.getItem('felhasz'));
@@ -44,50 +43,75 @@ const AppContent = () => {
   const [showDropdown, setShowDropdown] = useState(false);
   const isEventListPage = location.pathname === "/events";
   const [isGridView, setIsGridView] = useState(true);
+  const [loading, setLoading] = useState(true);
 
-  // Ellenőrizzük, hogy a felhasználó be van-e jelentkezve a localStorage-ból
+  // Check if user is logged in from localStorage
   useEffect(() => {
     const storedUser = JSON.parse(localStorage.getItem("felhasz"));
     if (storedUser) {
       setUser(storedUser);
     }
-    let url = "https://esemenyrendezo1.azurewebsites.net/api/Esemeny/";
-    axios
-      .get(url)
-      .then((response) => {
-        setEvents(response.data);
-      })
-      .catch((error) => {
+   
+    // Fetch events from Firestore instead of API
+    const fetchEvents = async () => {
+      try {
+        const q = query(collection(db, 'events'), orderBy('Datum', 'desc'));
+        const querySnapshot = await getDocs(q);
+        const eventsData = querySnapshot.docs.map(docSnap => ({
+          id: docSnap.id,
+          ...docSnap.data()
+        }));
+        setEvents(eventsData);
+        setLoading(false);
+      } catch (error) {
         console.error("Error fetching events:", error);
-      });
-      setupAxiosDefaults();
+        setLoading(false);
+      }
+    };
+   
+    fetchEvents();
+    setupAxiosDefaults();
   }, []);
 
   const handleAddEvent = (newEvent) => {
     setEvents((prevEvents) => {
       const updatedEvents = [...prevEvents, newEvent];
-      updatedEvents.sort((a, b) => new Date(a.datum) - new Date(b.datum));
+      // Sort events by date (for Firestore timestamp objects)
+      updatedEvents.sort((a, b) => {
+        const dateA = a.Datum?.seconds ? new Date(a.Datum.seconds * 1000) : new Date(a.Datum);
+        const dateB = b.Datum?.seconds ? new Date(b.Datum.seconds * 1000) : new Date(b.Datum);
+        return dateA - dateB;
+      });
       return updatedEvents;
     });
     setIsModalOpen(false);
   };
 
+  // Updated filtering logic for Firestore data structure
   const filteredEvents = events.filter((event) => {
+    // Handle Firestore timestamp objects
+    const eventDate = event.Datum?.seconds
+      ? new Date(event.Datum.seconds * 1000)
+      : new Date(event.Datum);
+   
+    // Date filtering
     const isDateMatch = filterDate
-      ? new Date(event.datum).toLocaleDateString() ===
-      new Date(filterDate).toLocaleDateString()
+      ? eventDate.toLocaleDateString() === new Date(filterDate).toLocaleDateString()
       : true;
 
+    // Time filtering
     const isTimeMatch = filterTime
-      ? new Date(event.datum).toLocaleTimeString().includes(filterTime)
+      ? eventDate.toLocaleTimeString().includes(filterTime)
       : true;
 
+    // Location filtering - using Helyszin instead of helyszin (case sensitive in Firestore)
     const isLocationMatch = filterLocation
-      ? event.helyszin?.toLowerCase().includes(filterLocation.toLowerCase())
+      ? event.Helyszin?.toLowerCase().includes(filterLocation.toLowerCase())
       : true;
 
+    // Name filtering - using Cime instead of cime (case sensitive in Firestore)
     const isNameMatch = filterName
-      ? event.cime?.toLowerCase().includes(filterName.toLowerCase())
+      ? event.Cime?.toLowerCase().includes(filterName.toLowerCase())
       : true;
 
     return isDateMatch && isTimeMatch && isLocationMatch && isNameMatch;
@@ -233,7 +257,7 @@ const AppContent = () => {
               )}
             </ul>
             <ul className="navbar-nav ms-auto">
-              {!user ? ( // Ha a felhasználó nincs bejelentkezve
+              {!user ? ( // If user is not logged in
                 <>
                   <li className="nav-item">
                     <NavLink
@@ -257,8 +281,7 @@ const AppContent = () => {
                   </li>
                 </>
               ) : (
-                <li className="nav-item position-relative d-flex align-items-center"
->
+                <li className="nav-item position-relative d-flex align-items-center">
                   <motion.img
                     src={gear}
                     alt="Beállítások"
@@ -402,7 +425,7 @@ const AppContent = () => {
         </Routes>
       </div>
 
-      {/* A modális ablak */}
+      {/* Modal window */}
       {isModalOpen && (
         <div className="modal show" tabIndex="-1" style={{ display: "block" }}>
           <div className="modal-dialog">

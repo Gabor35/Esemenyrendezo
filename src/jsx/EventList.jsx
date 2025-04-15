@@ -16,8 +16,9 @@ import heartIcon from '../pictures/heart.svg';
 import heartFillIcon from '../pictures/heart-fill.svg';
 import { useGlobalContext } from '../Context/GlobalContext';
 
-const EventList = ({ isGridView = false }) => {
-  const [events, setEvents] = useState([]);
+const EventList = ({ events: initialEvents = [], isGridView = false }) => {
+  // Create state to manage events locally
+  const [events, setEvents] = useState(initialEvents);
   const [selectedEvent, setSelectedEvent] = useState(null);
   const [showModal, setShowModal] = useState(false);
   const [filledHearts, setFilledHearts] = useState({});
@@ -28,27 +29,31 @@ const EventList = ({ isGridView = false }) => {
   // Get user data from localStorage
   const userData = JSON.parse(localStorage.getItem('felhasz'));
 
-  // Fetch events from Firestore "events" collection
+  // Use the events passed from props or fetch them if not provided
   useEffect(() => {
-    const fetchEvents = async () => {
-      try {
-        const q = query(collection(db, 'events'), orderBy('Datum', 'desc'));
-        const querySnapshot = await getDocs(q);
-        const eventsData = querySnapshot.docs.map(docSnap => ({
-          id: docSnap.id,
-          ...docSnap.data()
-        }));
-        setEvents(eventsData);
-        setLoading(false);
-      } catch (e) {
-        console.error("Hiba történt az események lekérésekor: ", e);
-        setError('Hiba történt az események betöltése során');
-        setLoading(false);
-      }
-    };
+    if (events.length > 0) {
+      setLoading(false);
+    } else {
+      const fetchEvents = async () => {
+        try {
+          const q = query(collection(db, 'events'), orderBy('Datum', 'desc'));
+          const querySnapshot = await getDocs(q);
+          const eventsData = querySnapshot.docs.map(docSnap => ({
+            id: docSnap.id,
+            ...docSnap.data()
+          }));
+          setEvents(eventsData);  // Now safe to call setEvents
+          setLoading(false);
+        } catch (e) {
+          console.error("Hiba történt az események lekérésekor: ", e);
+          setError('Hiba történt az események betöltése során');
+          setLoading(false);
+        }
+      };
 
-    fetchEvents();
-  }, []);
+      fetchEvents();
+    }
+  }, [events]);
 
   // Check saved events for the current user from Firestore "saveEvents" collection
   useEffect(() => {
@@ -79,6 +84,7 @@ const EventList = ({ isGridView = false }) => {
   // Save/Unsave event using Firestore in the "saveEvents" collection.
   const handleHeartClick = async (eventId, e) => {
     e.preventDefault();
+
     if (!userData) {
       alert('Be kell jelentkezned az esemény mentéséhez');
       return;

@@ -163,13 +163,6 @@ export const Login = () => {
                 >
                   Bejelentkezés
                 </Button>
-                <Button
-                  variant="link"
-                  className="w-100 mt-2 forgot-password-btn"
-                  onClick={() => navigate("/ForgotPassword")}
-                >
-                  Elfelejtett jelszó?
-                </Button>
               </Form>
             </Card.Body>
           )}
