@@ -1,3 +1,4 @@
+// App.jsx
 import { GlobalProvider } from "../Context/GlobalContext";
 import React, { useState, useEffect } from "react";
 import { BrowserRouter as Router, Routes, Route, NavLink, useLocation } from "react-router-dom";
@@ -8,13 +9,13 @@ import { Login } from "../UsersLogin/Login";
 import { Register } from "../UsersLogin/Register";
 import ForgotPassword from "./ForgotPassword";
 import AddEvent from "./AddEvent";
-import EventList  from "./EventList";
+import EventList from "./EventList";
 import logo from "../pictures/logo.jpg";
 import hatterGif from "../pictures/background.jpg";
 import Chat from "./chat";
 import { Calendar } from "./calendar";
-import  Saved  from "./saved";
-import Esemenyek from "./Esemenyek";  // If you still need this, rename the route below
+import Saved from "./saved";
+import Esemenyek from "./Esemenyek";  // Reassigned to a different route (if still needed)
 import axios from "axios";
 import Aboutus from "./aboutus";
 import gear from "../pictures/gear-fill.svg";
@@ -51,7 +52,7 @@ const AppContent = () => {
     if (storedUser) {
       setUser(storedUser);
     }
-
+    
     // Fetch events from Firestore instead of API
     const fetchEvents = async () => {
       try {
@@ -76,42 +77,29 @@ const AppContent = () => {
   const handleAddEvent = (newEvent) => {
     setEvents((prevEvents) => {
       const updatedEvents = [...prevEvents, newEvent];
-      // Sort events by date (for Firestore timestamp objects)
-      updatedEvents.sort((a, b) => {
-        const dateA = a.Datum?.seconds ? new Date(a.Datum.seconds * 1000) : new Date(a.Datum);
-        const dateB = b.Datum?.seconds ? new Date(b.Datum.seconds * 1000) : new Date(b.Datum);
-        return dateA - dateB;
-      });
+      // Sort events by date. Datum is stored as string,
+      // so a simple Date constructor works if the string is ISO formatted.
+      updatedEvents.sort((a, b) => new Date(a.Datum) - new Date(b.Datum));
       return updatedEvents;
     });
     setIsModalOpen(false);
   };
 
-  // Updated filtering logic for Firestore data structure
+  // UPDATED FILTERING LOGIC: All fields (including Datum) are stored as string.
   const filteredEvents = events.filter((event) => {
-    // Handle Firestore timestamp objects
-    const eventDate = event.Datum?.seconds
-      ? new Date(event.Datum.seconds * 1000)
-      : new Date(event.Datum);
+    const eventDateString = event.Datum || "";
+    // Extract date part: "YYYY-MM-DD"
+    const eventDatePart = eventDateString.slice(0, 10);
+    // Extract time part: "HH:MM"
+    const eventTimePart = eventDateString.slice(11, 16);
 
-    // Date filtering
-    const isDateMatch = filterDate
-      ? eventDate.toLocaleDateString() === new Date(filterDate).toLocaleDateString()
-      : true;
-
-    // Time filtering
-    const isTimeMatch = filterTime
-      ? eventDate.toLocaleTimeString().includes(filterTime)
-      : true;
-
-    // Location filtering - using Helyszin instead of helyszin (case sensitive in Firestore)
+    const isDateMatch = filterDate ? eventDatePart === filterDate : true;
+    const isTimeMatch = filterTime ? eventTimePart === filterTime : true;
     const isLocationMatch = filterLocation
-      ? event.Helyszin?.toLowerCase().includes(filterLocation.toLowerCase())
+      ? (event.Helyszin ? event.Helyszin.toLowerCase().includes(filterLocation.toLowerCase()) : false)
       : true;
-
-    // Name filtering - using Cime instead of cime (case sensitive in Firestore)
     const isNameMatch = filterName
-      ? event.Cime?.toLowerCase().includes(filterName.toLowerCase())
+      ? (event.Cime ? event.Cime.toLowerCase().includes(filterName.toLowerCase()) : false)
       : true;
 
     return isDateMatch && isTimeMatch && isLocationMatch && isNameMatch;
@@ -326,7 +314,6 @@ const AppContent = () => {
 
       <div className="container mt-4">
         {/* Only show filter controls when on the events page */}
-
         {isEventListPage && (
           <div className="row mb-4">
             <div className="col-12">
@@ -385,7 +372,6 @@ const AppContent = () => {
                     />
                   </div>
 
-                  {/* Clear Filters Button */}
                   <motion.button
                     className="btn btn-secondary"
                     onClick={() => {
@@ -408,7 +394,7 @@ const AppContent = () => {
         )}
 
         <Routes>
-          {/* IMPORTANT: Keep only ONE route for /events so EventList actually renders */}
+          {/* Route for filtered events */}
           <Route
             path="/events"
             element={<EventList events={filteredEvents} isGridView={isGridView} />}
@@ -419,11 +405,7 @@ const AppContent = () => {
           <Route path="/register" element={<Register />} />
           <Route path="/forgotpassword" element={<ForgotPassword />} />
 
-          {/*
-            If you still want to use Esemenyek for some reason,
-            give it a different path like "/esemenyek" 
-            instead of also /events.
-          */}
+          {/* If you still need Esemenyek, assign a unique path */}
           <Route path="/esemenyek" element={<Esemenyek />} />
 
           <Route path="/chat" element={<Chat />} />
@@ -434,7 +416,7 @@ const AppContent = () => {
         </Routes>
       </div>
 
-      {/* Modal window */}
+      {/* Modal for adding a new event */}
       {isModalOpen && (
         <div className="modal show" tabIndex="-1" style={{ display: "block" }}>
           <div className="modal-dialog">
