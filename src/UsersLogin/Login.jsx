@@ -1,22 +1,22 @@
 import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { useGlobalContext } from "../Context/GlobalContext";
-import { useNavigate } from "react-router-dom";
-import { Container, Card, Form, Button, Image } from "react-bootstrap";
 import axios from "axios";
 import { sha256 } from "js-sha256";
+import { useNavigate } from "react-router-dom";
+import { Container, Card, Form, Button, Image } from "react-bootstrap";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "./login.css";
 
-const Login = () => {
+export const Login = () => {
   const [loginName, setLoginName] = useState("");
   const [password, setPassword] = useState("");
   const [user, setUser] = useState(null);
   const [avatar, setAvatar] = useState("");
 
   const {
-    ftpUrl,
     apiUrl,
+    ftpUrl,
     loggedUser,
     setLoggedUser,
     loggedIn,
@@ -27,24 +27,40 @@ const Login = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
+    if (loggedIn) {
+      alert(loggedUser?.name || loginName + "sikeresen bejelentkezett!");
+    }
     const storedUser = JSON.parse(localStorage.getItem("felhasz"));
     if (storedUser) {
       setUser(storedUser);
-      setLoggedUser(storedUser);
-      setLoggedUserName(storedUser.name || storedUser.loginName);
+      setAvatar(`${ftpUrl}${storedUser.profilePicturePath}`);
       navigate("/events");
     }
-  }, [navigate]);
+  }, [navigate, loggedIn]);
 
-  const handleLogin = async (e) => {
-    e.preventDefault();
-
-    if (!loginName || !password) {
-      alert("Kérjük, töltse ki mindkét mezőt!");
-      return;
+  const handleLogout = async () => {
+    if (user?.token) {
+      try {
+        await axios.post(`${apiUrl}Logout/${user.token}`);
+        console.log("Kijelentkezés sikeres!");
+      } catch (error) {
+        console.error("Hiba történt a kijelentkezés során:", error);
+      }
     }
+    localStorage.removeItem("felhasz");
+    setUser(null);
+    setAvatar("");
+    console.log("Sikeres kijelentkezés!");
+    navigate("/login");
+  };
 
+  const handleLogin = async () => {
     try {
+      if (!loginName || !password) {
+        alert("Kérjük, töltse ki mindkét mezőt!");
+        return;
+      }
+
       const { data: salt } = await axios.post(`${apiUrl}Login/GetSalt/${loginName}`);
       const tmpHash = sha256(password + salt.toString());
 
@@ -53,32 +69,40 @@ const Login = () => {
         tmpHash
       });
 
-      const normalizedUser = {
-        ...userData,
-        name: userData.name || loginName,
-        profilePicturePath: userData.profilePicturePath || ""
-      };
+      if (userData) {
+        const normalizedUser = {
+          ...userData,
+          name:
+            userData.name ||
+            userData.Name ||
+            userData.teljesNev ||
+            userData.felhasznaloNev ||
+            loginName,
+          profilePicturePath:
+            userData.profilePicturePath ||
+            userData.ProfilePicturePath ||
+            userData.fenykepUtvonal ||
+            ''
+        };
 
-      setLoggedUser(normalizedUser);
-      setLoggedUserName(normalizedUser.name);
-      setLoggedIn(true);
-      localStorage.setItem("felhasz", JSON.stringify(normalizedUser));
-      setUser(normalizedUser);
-      if (normalizedUser.profilePicturePath) {
+        setLoggedUser(normalizedUser);
+        setLoggedUserName(normalizedUser.name);
+        setLoggedIn(true);
+        localStorage.setItem("felhasz", JSON.stringify(normalizedUser));
+        setUser(normalizedUser);
         setAvatar(`${ftpUrl}${normalizedUser.profilePicturePath}`);
+        navigate("/events");
       }
-      navigate("/events");
     } catch (error) {
       alert("Hiba történt: " + (error.response?.data?.message || error.message));
     }
   };
 
-  const handleLogout = () => {
-    localStorage.removeItem("felhasz");
-    setUser(null);
-    setLoggedUser(null);
-    setLoggedIn(false);
-    navigate("/login");
+  const handleLoginWithRefresh = () => {
+    handleLogin();
+    setTimeout(() => {
+      window.location.reload();
+    }, 1000);
   };
 
   return (
@@ -102,17 +126,21 @@ const Login = () => {
                   className="profile-avatar"
                 />
               )}
-              <Button variant="danger" onClick={handleLogout} className="w-100 logout-btn">
+              <Button
+                variant="danger"
+                onClick={handleLogout}
+                className="w-100 logout-btn"
+              >
                 Kijelentkezés
               </Button>
             </Card.Body>
           ) : (
             <Card.Body>
               <h2 className="text-center title text-info">Bejelentkezés</h2>
-              <Form onSubmit={handleLogin}>
+              <Form>
                 <Form.Group className="mb-3">
                   <Form.Control
-                    type="text"
+                    type="email"
                     placeholder="Felhasználónév"
                     value={loginName}
                     onChange={(e) => setLoginName(e.target.value)}
@@ -128,8 +156,19 @@ const Login = () => {
                     className="input-field"
                   />
                 </Form.Group>
-                <Button variant="primary" type="submit" className="w-100 login-btn">
+                <Button
+                  variant="primary"
+                  className="w-100 login-btn"
+                  onClick={handleLoginWithRefresh}
+                >
                   Bejelentkezés
+                </Button>
+                <Button
+                  variant="link"
+                  className="w-100 mt-2 forgot-password-btn"
+                  onClick={() => navigate("/ForgotPassword")}
+                >
+                  Elfelejtett jelszó?
                 </Button>
               </Form>
             </Card.Body>
@@ -139,5 +178,3 @@ const Login = () => {
     </Container>
   );
 };
-
-export default Login;

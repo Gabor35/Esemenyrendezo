@@ -1,8 +1,8 @@
-// EventList.jsx
 import React, { useState, useEffect } from 'react';
-import { collection, getDocs, query, orderBy, doc, getDoc, setDoc, deleteDoc } from 'firebase/firestore';
+import { collection, getDocs, query, orderBy } from 'firebase/firestore';
 import { db } from './firebase2';
 import { Modal } from 'react-bootstrap';
+import axios from 'axios';
 import { motion, AnimatePresence } from 'framer-motion';
 import heartIcon from '../pictures/heart.svg';
 import heartFillIcon from '../pictures/heart-fill.svg';
@@ -15,28 +15,25 @@ const EventList = ({ isGridView = false }) => {
   const [filledHearts, setFilledHearts] = useState({});
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
-  const { /*apiUrl*/ } = useGlobalContext();
+  const { apiUrl } = useGlobalContext();
 
-  // Read user info from localStorage; should contain at least { uid: "xxx" }
   const userData = JSON.parse(localStorage.getItem('felhasz'));
-  const userUid = userData ? userData.uid : null;
+  const token = userData ? userData.token : null;
 
-  // Fetch events from Firestore
   useEffect(() => {
     const fetchEvents = async () => {
       try {
-        const eventsCollection = collection(db, 'events');
-        const q = query(eventsCollection, orderBy('Datum', 'desc'));
+        const q = query(collection(db, 'events'), orderBy('Datum', 'desc'));
         const querySnapshot = await getDocs(q);
-        const eventsData = querySnapshot.docs.map(docSnap => ({
-          id: docSnap.id,
-          ...docSnap.data()
+        const eventsData = querySnapshot.docs.map(doc => ({
+          id: doc.id,
+          ...doc.data()
         }));
         setEvents(eventsData);
         setLoading(false);
       } catch (e) {
-        console.error("Error fetching events: ", e);
-        setError('Error loading events');
+        console.error("Hiba történt az események lekérésekor: ", e);
+        setError('Hiba történt az események betöltése során');
         setLoading(false);
       }
     };
@@ -44,64 +41,54 @@ const EventList = ({ isGridView = false }) => {
     fetchEvents();
   }, []);
 
-  // Check for saved events by reading the simplified structure in "savedEvents"
   useEffect(() => {
     const checkSavedEvents = async () => {
-      if (!userUid || events.length === 0) return;
+      if (!token || !events.length) return;
 
       try {
-        const savedHeartsState = {};
-        // For each event, check if a document exists in "savedEvents" with id = `${userUid}_${event.id}`
+        const savedHearts = {};
         for (const event of events) {
-          const savedDocRef = doc(db, 'savedEvents', `${userUid}_${event.id}`);
-          const docSnap = await getDoc(savedDocRef);
-          savedHeartsState[event.id] = docSnap.exists();
+          if (!event.id) continue;
+          const response = await axios.get(`${apiUrl}Reszvetel/check/${token}/${event.id}`);
+          savedHearts[event.id] = response.data;
         }
-        setFilledHearts(savedHeartsState);
-      } catch (err) {
-        console.error('Error checking saved events:', err);
+        setFilledHearts(savedHearts);
+      } catch (error) {
+        console.error('Error checking saved events:', error);
       }
     };
 
     checkSavedEvents();
-  }, [events, userUid]);
+  }, [events, token, apiUrl]);
 
   const handleHeartClick = async (eventId, e) => {
     e.preventDefault();
-    if (!userUid) {
-      alert('You must be logged in to save an event');
+    if (!token) {
+      alert('Be kell jelentkezned az esemény mentéséhez');
       return;
     }
-
-    const savedDocRef = doc(db, 'savedEvents', `${userUid}_${eventId}`);
-
     try {
-      const docSnap = await getDoc(savedDocRef);
-      if (docSnap.exists()) {
-        // Already saved, so unsave it
-        await deleteDoc(savedDocRef);
-        setFilledHearts(prev => ({ ...prev, [eventId]: false }));
+      if (filledHearts[eventId]) {
+        await axios.delete(`${apiUrl}Reszvetel/${token}/${eventId}`);
       } else {
-        // Save the event by setting a new document; you can add any fields as needed.
-        await setDoc(savedDocRef, {
-          userId: userUid,
-          eventId: eventId,
-          savedAt: new Date()
-        });
-        setFilledHearts(prev => ({ ...prev, [eventId]: true }));
+        // ✅ FIXED: add empty body as second parameter
+        await axios.post(`${apiUrl}Reszvetel/${token}/${eventId}`, {});
+        console.log('Esemény mentve:', token);
+        console.log('Esemény mentve:', eventId);
       }
+      setFilledHearts(prev => ({ ...prev, [eventId]: !prev[eventId] }));
     } catch (error) {
-      console.error("Error toggling save:", error);
-      alert("Error saving the event.");
+      alert('Hiba: ' + (error.response?.data || error.message));
     }
   };
+  
 
   const handleShowDetails = (event) => {
     setSelectedEvent(event);
     setShowModal(true);
   };
 
-  if (loading) return <div>Loading...</div>;
+  if (loading) return <div>Betöltés...</div>;
   if (error) return <div className="alert alert-danger">{error}</div>;
 
   return (
@@ -135,9 +122,7 @@ const EventList = ({ isGridView = false }) => {
                 )}
                 <div className="card-body" style={isGridView ? {} : { flex: 1 }}>
                   <h5 className="card-title">{event.Cime}</h5>
-                  <p className="card-text">
-                    Datum: {new Date(event.Datum?.seconds ? event.Datum.seconds * 1000 : event.Datum).toLocaleString()}
-                  </p>
+                  <p className="card-text">Dátum: {new Date(event.Datum?.seconds ? event.Datum.seconds * 1000 : event.Datum).toLocaleString()}</p>
                   <p className="card-text">Helyszín: {event.Helyszin}</p>
                   <motion.button
                     className="btn btn-secondary"
@@ -145,7 +130,7 @@ const EventList = ({ isGridView = false }) => {
                     whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.95 }}
                   >
-                    Details
+                    Részletek
                   </motion.button>
                   <button
                     style={{ background: 'none', border: 'none', cursor: 'pointer', padding: '5px', marginLeft: '10px' }}
@@ -180,10 +165,7 @@ const EventList = ({ isGridView = false }) => {
                   style={{ width: '100%', objectFit: 'cover' }}
                 />
               )}
-              <p>
-                <strong>Dátum:</strong>{" "}
-                {new Date(selectedEvent.Datum?.seconds ? selectedEvent.Datum.seconds * 1000 : selectedEvent.Datum).toLocaleString()}
-              </p>
+              <p><strong>Dátum:</strong> {new Date(selectedEvent.Datum?.seconds ? selectedEvent.Datum.seconds * 1000 : selectedEvent.Datum).toLocaleString()}</p>
               <p><strong>Helyszín:</strong> {selectedEvent.Helyszin}</p>
               <p><strong>Leírás:</strong> {selectedEvent.Leiras}</p>
             </>
@@ -196,7 +178,7 @@ const EventList = ({ isGridView = false }) => {
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
           >
-            Close
+            Bezárás
           </motion.button>
         </Modal.Footer>
       </Modal>
