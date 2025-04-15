@@ -14,20 +14,24 @@ const Saved = () => {
   const [showModal, setShowModal] = useState(false);
   const { apiUrl } = useGlobalContext();
 
-  // Get user data from localStorage
-  const userData = JSON.parse(localStorage.getItem('felhasz'));
+  // Get user data from localStorage once when component mounts
+  const [userData, setUserData] = useState(null);
+ 
+  useEffect(() => {
+    const storedUser = JSON.parse(localStorage.getItem('felhasz'));
+    if (storedUser) {
+      setUserData(storedUser);
+    }
+  }, []);
 
   // Fetch saved events in a single operation
   useEffect(() => {
+    // Skip if userData is not loaded yet
+    if (!userData) return;
+   
     const fetchSavedEvents = async () => {
       setLoading(true);
       setError(null);
-
-      if (!userData) {
-        setError('Be kell jelentkezned a mentett események megtekintéséhez');
-        setLoading(false);
-        return;
-      }
 
       try {
         // Query saveEvents documents for the current user
@@ -73,7 +77,7 @@ const Saved = () => {
     };
 
     fetchSavedEvents();
-  }, [userData]);
+  }, [userData]); // Only run when userData changes (which happens once on mount)
 
   // Show modal with event details
   const handleShowDetails = (event) => {
@@ -101,12 +105,20 @@ const Saved = () => {
     }
   };
 
-  if (loading) {
+  if (loading && userData) {
     return <div className="container mt-4">Mentett események betöltése...</div>;
   }
 
   if (error) {
     return <div className="container mt-4 alert alert-danger">{error}</div>;
+  }
+
+  if (!userData) {
+    return (
+      <div className="container mt-4 d-flex justify-content-center align-items-center" style={{ height: "100vh", fontSize: "30px" }}>
+        <div className="text-white">Be kell jelentkezned a mentett események megtekintéséhez</div>
+      </div>
+    );
   }
 
   if (savedEvents.length === 0) {
